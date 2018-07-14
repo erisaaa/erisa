@@ -1,0 +1,22 @@
+{
+  "name": "erisa",
+  "version": "0.0.1",
+  "description": "A modular, unopiniated, middleware-based Discord bot framework.",
+  "main": "index.js",
+  "author": "Ovyerus <iamovyerus@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint ./src",
+    "compile": "sucrase ./src -d ./dist --transforms imports --enableLegacyBabel5ModuleInterop",
+    "build": "npm run lint && npm run compile"
+  },
+  "dependencies": {
+    "eris": "^0.8.6"
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "ts-node": "^7.0.0",
+    "tslint": "^5.10.0",
+    "typescript": "^2.9.2"
+  }
+}

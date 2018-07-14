@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "outDir": "./dist/",
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "strictNullChecks": true
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
