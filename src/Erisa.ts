@@ -15,16 +15,29 @@ export default class Erisa extends Eris.Client {
         this.currentlyAwaiting = new Map();
     }
 
-    use(events: string | string[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]) {
-        const handlers: MiddlewareHandler[] = [].concat.apply(handlers); // Flatten rest handlers into a single array.
-        const events = typeof events === 'string' ? [events] : events;
+    use(events: string | string[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
 
-        for (const ev of events) {
+    use(...args) {
+        const flattenedArgs = [].concat.apply(args);
+
+        function setHandlers(ev, handlers) {
             if (!this.handlers.get(ev)) this.handlers.set(ev, handlers);
             else this.handlers.set(ev, this.handlers.get(ev).concat(handlers));
 
             if (!this.eventNames().includes(ev)) this.on(ev, this.handleEvent(ev));
         }
+
+        if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true)) setHandlers('*', flattenedArgs);
+        else {
+            let [events, ...handlers] = args;
+            handlers = [].concat.apply(handlers);
+            events = typeof events === 'string' ? [events] : events;
+
+            for (const ev of events) setHandlers(ev, handlers);
+        }
+
+        return this;
     }
 
     handleEvent(ev: string): (...args: any[]) => void {
