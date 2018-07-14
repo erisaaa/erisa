@@ -1,7 +1,7 @@
 {
   "name": "erisa",
   "version": "0.0.1",
-  "description": "A modular, unopiniated, middleware-based Discord bot framework.",
+  "description": "A modular, unopinionated, middleware-based Discord bot framework.",
   "main": "index.js",
   "author": "Ovyerus <iamovyerus@gmail.com>",
   "license": "MIT",
