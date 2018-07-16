@@ -1,9 +1,9 @@
 import {ClientOptions} from 'eris';
 
-export type MiddlewareHandler = (eventName: string, , ...eventArgs: any[]) => Error?;
+export type MiddlewareHandler = (eventName?: string, , ...eventArgs?: any[]) => (Error | void)?;
 
 export interface ErisaOptions {
-    erisOptions: ClientOptions;
+    erisOptions?: ClientOptions;
 }
 
 export interface AwaitMessageOptions {

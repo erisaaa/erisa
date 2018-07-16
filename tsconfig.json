@@ -1,14 +1,22 @@
 {
     "compilerOptions": {
         "target": "es6",
+        "lib": ["esnext"],
         "module": "commonjs",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "outDir": "./dist/",
+        "outDir": "dist/",
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
     },
+    "include": [
+        "src/",
+        "index.ts",
+        "package.json"
+    ],
     "exclude": [
         "node_modules",
         "dist"
