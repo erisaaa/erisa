@@ -1,16 +1,13 @@
 import * as Eris from 'eris';
-import pkg = require('../package.json');
 import {AwaitingObject, AwaitMessageOptions, ErisaOptions, MiddlewareHandler} from './typedefs';
 
 export default class Erisa extends Eris.Client {
-    public erisaVersion: string;
     public handlers: Map<string, MiddlewareHandler[]>;
     public currentlyAwaiting: Map<string, AwaitingObject>;
 
     constructor(token: string, options: ErisaOptions = {}) {
         super(token, options.erisOptions);
 
-        this.erisaVersion = pkg.version;
         this.handlers = new Map();
         this.currentlyAwaiting = new Map();
     }
