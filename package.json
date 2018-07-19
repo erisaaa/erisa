@@ -25,5 +25,10 @@
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
     "typescript": "^2.9.2"
-  }
+  },
+  "files": [
+    "src/",
+    "dist/",
+    "index.ts"
+  ]
 }
