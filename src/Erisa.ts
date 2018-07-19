@@ -1,5 +1,6 @@
 import * as Eris from 'eris';
-import {AwaitingObject, AwaitMessageOptions, ErisaOptions, MiddlewareHandler} from './typedefs';
+import awaitMessageHandler from './awaitMessageHandler';
+import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, MiddlewareHandler} from './types';
 
 export default class Erisa extends Eris.Client {
     public handlers: Map<string, MiddlewareHandler[]>;
@@ -10,6 +11,9 @@ export default class Erisa extends Eris.Client {
 
         this.handlers = new Map();
         this.currentlyAwaiting = new Map();
+
+        this.on('*', this.handleEvent('*'));
+        this.use('createMessage', awaitMessageHandler);
     }
 
     use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
@@ -44,9 +48,10 @@ export default class Erisa extends Eris.Client {
             [resolve, reject] = args;
         });
 
+        // Composes an object that resembles a semi-deconstructed promise, so that it can be returned now, and resolved/rejected at a later time.
         const deferred = {promise, resolve, reject};
         const timer = setTimeout(() => {
-            deferred.reject(new Error('Message await expired.'));
+            deferred.reject(new AwaitTimeout('Message await expired.'));
             this.currentlyAwaiting.delete(id);
         }, timeout);
 

@@ -22,3 +22,14 @@ export interface AwaitingObject {
     timer: NodeJS.Timer;
     filter(msg: Eris.Message): boolean;
 }
+
+/**
+ * An error that is thrown when an `awaitMessage` call expires.
+ */
+export class AwaitTimeout extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'AwaitTimeout';
+        this.stack = new Error().stack;
+    }
+}
