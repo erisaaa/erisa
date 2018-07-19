@@ -17,15 +17,15 @@ export default class Erisa extends Eris.Client {
     }
 
     use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
-    use(events: string | string[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    use(events: string | string[] | RegExp | RegExp[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
 
     use(...args) {
         const flattenedArgs = [].concat.apply([], args);
-        const setHandlers = (ev: string, handlers: MiddlewareHandler[]) => {
+        const setHandlers = (ev: string | RegExp, handlers: MiddlewareHandler[]) => {
             if (!this.handlers.get(ev)) this.handlers.set(ev, handlers);
             else this.handlers.set(ev, this.handlers.get(ev)!.concat([], handlers)); // typescript is dumb here :(
 
-            if (!this.eventNames().includes(ev)) this.on(ev, this.handleEvent(ev));
+            if (typeof ev === 'string' && !this.eventNames().includes(ev)) this.on(ev, this.handleEvent(ev));
         };
 
         if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true)) setHandlers('*', flattenedArgs);
@@ -64,11 +64,24 @@ export default class Erisa extends Eris.Client {
         return deferred.promise;
     }
 
+    emit(event: string | symbol, ...args?: any[]): boolean {
+        super.emit('*', event, args);
+
+        return super.emit(event, ...args);
+    }
+
     private handleEvent(ev: string): (...args: any[]) => void {
-        return function(...args) { // tslint:disable-line
+        if (ev === '*') return function(event, ...args) {
+            const matchingEvents = Array.from(this.handlers.keys()).filter(k => k instanceof RegExp ? k.test(event) : minimatch(event));
+            const handlers = Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]);
+
+            for (const handler of handlers) handler({event, erisa: this}, ...args);
+        }.bind(this);
+
+        return function(...args) {
             if (!this.handlers.get(ev)) return;
 
             for (const handler of this.handlers.get(ev)) handler(ev, ...args);
-        };
+        }.bind(this);
     }
 }
