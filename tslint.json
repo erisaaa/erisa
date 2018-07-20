@@ -82,7 +82,6 @@
         "no-unsafe-any": false,
         "no-unsafe-finally": true,
         "no-unused-expression": [true, "allow-fast-null-checks"],
-        "no-unused-variable": [true, "check-parameters"],
         "no-var-keyword": true,
         "no-void-expression": [true, "ignore-arrow-function-shorthand"],
         "prefer-conditional-expression": [true, "check-else-if"],

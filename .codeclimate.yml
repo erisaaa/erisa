@@ -14,7 +14,7 @@ engines:
     enabled: true
     config: tslint.json
   fixme:
-      enabled: true
+    enabled: true
 ratings:
   paths:
-- "**.js"
+    - "**.ts"
