@@ -1,9 +1,10 @@
 import * as Eris from 'eris';
+import minimatch from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
-import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, MiddlewareHandler} from './types';
+import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler} from './types';
 
 export default class Erisa extends Eris.Client {
-    public handlers: Map<string, MiddlewareHandler[]>;
+    public handlers: Map<Matchable, MiddlewareHandler[]>;
     public currentlyAwaiting: Map<string, AwaitingObject>;
 
     constructor(token: string, options: ErisaOptions = {}) {
@@ -17,11 +18,11 @@ export default class Erisa extends Eris.Client {
     }
 
     use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
-    use(events: string | string[] | RegExp | RegExp[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    use(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
 
     use(...args) {
         const flattenedArgs = [].concat.apply([], args);
-        const setHandlers = (ev: string | RegExp, handlers: MiddlewareHandler[]) => {
+        const setHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
             if (!this.handlers.get(ev)) this.handlers.set(ev, handlers);
             else this.handlers.set(ev, this.handlers.get(ev)!.concat([], handlers)); // typescript is dumb here :(
 
@@ -64,7 +65,7 @@ export default class Erisa extends Eris.Client {
         return deferred.promise;
     }
 
-    emit(event: string | symbol, ...args?: any[]): boolean {
+    emit(event: string | symbol, ...args: any[]): boolean {
         super.emit('*', event, args);
 
         return super.emit(event, ...args);
@@ -72,7 +73,7 @@ export default class Erisa extends Eris.Client {
 
     private handleEvent(ev: string): (...args: any[]) => void {
         if (ev === '*') return function(event, ...args) {
-            const matchingEvents = Array.from(this.handlers.keys()).filter(k => k instanceof RegExp ? k.test(event) : minimatch(event));
+            const matchingEvents = Array.from(this.handlers.keys()).filter(k => k instanceof RegExp ? k.test(event) : minimatch(event, k as string));
             const handlers = Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]);
 
             for (const handler of handlers) handler({event, erisa: this}, ...args);

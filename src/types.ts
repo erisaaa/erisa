@@ -1,9 +1,11 @@
-import {ClientOptions} from 'eris';
+import * as Eris from 'eris';
+import Erisa from './Erisa';
 
-export type MiddlewareHandler = (eventName?: string, , ...eventArgs?: any[]) => (Error | void)?;
+export type MiddlewareHandler = (generalArgs: {event: string; erisa: Erisa}, ...eventArgs: any[]) => Error | void;
+export type Matchable = string | RegExp;
 
 export interface ErisaOptions {
-    erisOptions?: ClientOptions;
+    erisOptions?: Eris.ClientOptions;
 }
 
 export interface AwaitMessageOptions {
@@ -12,7 +14,7 @@ export interface AwaitMessageOptions {
 }
 
 export interface DeferredPromise {
-    promise: Promise;
+    promise: Promise<any>;
     resolve(value?: any): Promise<any>;
     reject(error?: any): Promise<any>;
 }
