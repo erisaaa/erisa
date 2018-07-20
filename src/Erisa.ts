@@ -41,6 +41,39 @@ export default class Erisa extends Eris.Client {
         return this;
     }
 
+    disuse(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    disuse(events: Matchable | Matchable[]): this;
+    disuse(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+
+    disuse(...args) {
+        const flattenedArgs = [].concat.apply([], args);
+        const removeHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
+            if (!this.handlers.get(ev)) return;
+
+            for (const handler of handlers) {
+                const ourHandlers: [Matchable, MiddlewareHandler[]][] = ev === '*'
+                    ? Array.from(this.handlers).filter(([_, hndlrs]) => hndlrs.includes(handler))
+                    : [ev, this.handlers.get(ev)];
+
+                for (const [event, hndlrs] of ourHandlers) this.handlers.set(event, hdnlrs.splice(hndlers.indexOf(handler), 1));
+            }
+
+            if (!this.handlers.get(ev)!.length) {
+                if (typeof ev === 'string') this.removeAllListeners(ev);
+                this.handlers.delete(ev);
+            }
+        };
+
+        if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true)) removeHandlers('*', flattenedArgs);
+        else {
+            let [events, ...handlers] = args;
+            handlers = [].concat.apply([], handlers);
+            events = typeof events === 'string' ? [events] : events;
+
+            for (const ev of events) removeHandlers(ev, handlers);
+        }
+    }
+
     awaitMessage(channelID: string, userID: string, options?: AwaitMessageOptions): Promise<Eris.Message> {
         let resolve, reject;
         const id = channelID + userID;
