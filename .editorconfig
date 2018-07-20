@@ -13,4 +13,5 @@ insert_final_newline = true
 trim_trailing_whitespace = false
 
 [*.json]
+[*.yml]
 indent_size = 2

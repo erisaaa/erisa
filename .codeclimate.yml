@@ -1,0 +1,20 @@
+checks:
+  return-statements:
+    enabled: false
+  method-complexity:
+    enabled: false
+  method-lines:
+    enabled: false
+  file-lines:
+    enabled: false
+  similar-code:
+    enabled: false
+engines:
+  tslint:
+    enabled: true
+    config: tslint.json
+  fixme:
+      enabled: true
+ratings:
+  paths:
+- "**.js"
