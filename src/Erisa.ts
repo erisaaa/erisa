@@ -54,7 +54,7 @@ export default class Erisa extends Eris.Client {
             for (const handler of handlers) {
                 const ourHandlers: [Matchable, MiddlewareHandler[]][] = ev === '*'
                     ? Array.from(this.handlers).filter(([_, hndlrs]) => hndlrs.includes(handler))
-                    : [[ev, this.handlers.get(ev)!]] as [Matchable, MiddlewareHandler[]][];
+                    : [[ev, this.handlers.get(ev)!]] as [Matchable, MiddlewareHandler[]][]; // tslint:disable-line
 
                 for (const [event, hndlrs] of ourHandlers) this.handlers.set(event, hndlrs.splice(hndlrs.indexOf(handler), 1));
             }
