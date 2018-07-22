@@ -1,5 +1,5 @@
-import * as Eris from 'eris';
-import minimatch from 'minimatch';
+import Eris from 'eris';
+import {default as minimatch} from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
 import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler} from './types';
 
@@ -49,13 +49,14 @@ export default class Erisa extends Eris.Client {
         const flattenedArgs = [].concat.apply([], args);
         const removeHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
             if (!this.handlers.get(ev)) return;
+            if (!handlers.length) handlers = this.handlers.get(ev)!;
 
             for (const handler of handlers) {
                 const ourHandlers: [Matchable, MiddlewareHandler[]][] = ev === '*'
                     ? Array.from(this.handlers).filter(([_, hndlrs]) => hndlrs.includes(handler))
-                    : [ev, this.handlers.get(ev)];
+                    : [[ev, this.handlers.get(ev)!]] as [Matchable, MiddlewareHandler[]][];
 
-                for (const [event, hndlrs] of ourHandlers) this.handlers.set(event, hdnlrs.splice(hndlers.indexOf(handler), 1));
+                for (const [event, hndlrs] of ourHandlers) this.handlers.set(event, hndlrs.splice(hndlrs.indexOf(handler), 1));
             }
 
             if (!this.handlers.get(ev)!.length) {
@@ -72,6 +73,8 @@ export default class Erisa extends Eris.Client {
 
             for (const ev of events) removeHandlers(ev, handlers);
         }
+
+        return this;
     }
 
     awaitMessage(channelID: string, userID: string, options?: AwaitMessageOptions): Promise<Eris.Message> {

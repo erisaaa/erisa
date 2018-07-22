@@ -1,4 +1,4 @@
-import * as Eris from 'eris';
+import Eris from 'eris';
 import Erisa from './Erisa';
 
 export type MiddlewareHandler = (generalArgs: {event: string; erisa: Erisa}, ...eventArgs: any[]) => Error | void;
