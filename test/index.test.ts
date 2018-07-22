@@ -65,5 +65,25 @@ describe('Middleware loader and unloader', () => {
 
             for (const ev of events) expect(client.handlers.get(ev)).to.deep.equal(handlers);
         });
+
+        it('should register the handler under the `*` event', () => {
+            client.use(handlers[0]);
+            expect(client.handlers.get('*')).to.deep.equal([handlers[0]]);
+        });
+
+        it('should register the handler array under the `*` event', () => {
+            client.use(handlers);
+            expect(client.handlers.get('*')).to.deep.equal(handlers);
+        });
+
+        it('should register the rest value of handlers under the `*` event', () => {
+            client.use(...handlers);
+            expect(client.handlers.get('*')).to.deep.equal(handlers);
+        });
+
+        it('should register the mix of handlers and arrays of handlers under the `*` event', () => {
+            client.use(...mixedHandlers);
+            expect(client.handlers.get('*')).to.deep.equal(handlers);
+        });
     });
 });
