@@ -1,12 +1,6 @@
 import Command from './Command';
-
-class Context {}
-class Erisa {}
-interface ICommandPermissions {
-    self: string | string[];
-    user: string | string[];
-    both: string | string[];
-}
+import Context from './Context';
+import {ICommandPermissions} from './';
 
 interface ISubCommandOptions {
     name?: string;
@@ -28,6 +22,7 @@ export default class SubCommand implements Command {
     hidden?: boolean;
     aliases?: string[];
     permissions?: ICommandPermissions;
+    readonly subcommands: SubCommand[] = [];
     main: (ctx: Context) => Promise<any>;
 
     constructor(options: ISubCommandOptions, main: (ctx: Context) => Promise<any>) {
@@ -46,6 +41,8 @@ export default class SubCommand implements Command {
 export function decorator(options: ISubCommandOptions) {
     return function __inner(target: any, property: string, descriptor: PropertyDescriptor) {
         target['_' + property] = target[property];
+
+        options.name = options.name ? options.name.toLowerCase() : property.toLowerCase();
         descriptor.value = () => new SubCommand(options, target['_' + property]);
 
         Object.defineProperty(target, '_ ' + property, {

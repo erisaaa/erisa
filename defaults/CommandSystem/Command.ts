@@ -1,21 +1,19 @@
-class Context {}
-class Erisa {}
-interface ICommandPermissions {
-    self: string | string[];
-    user: string | string[];
-    both: string | string[];
-}
+import Context from './Context';
+import SubCommand from './SubCommand';
+import {ICommandPermissions} from './';
 
 export default abstract class Command {
-    abstract name?: string;
+    name?: string;
     abstract overview: string;
-    abstract description?: string;
-    abstract ownerOnly?: boolean;
-    abstract guildOnly?: boolean;
-    abstract hidden?: boolean;
-    abstract aliases?: string[];
-    abstract permissions?: ICommandPermissions;
+    description?: string;
+    ownerOnly?: boolean;
+    guildOnly?: boolean;
+    hidden?: boolean;
+    aliases?: string[];
+    permissions?: ICommandPermissions;
+    readonly subcommands: SubCommand[] = [];
 
-    abstract async init?(): Promise<void>;
+    // constructor(readonly client: Erisa) {}
+    async init?(): Promise<void>;
     abstract async main(ctx: Context): Promise<void>;
 }
