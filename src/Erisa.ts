@@ -4,14 +4,12 @@ import awaitMessageHandler from './awaitMessageHandler';
 import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler} from './types';
 
 export default class Erisa extends Eris.Client {
-    public handlers: Map<Matchable, MiddlewareHandler[]>;
-    public currentlyAwaiting: Map<string, AwaitingObject>;
+    public handlers: Map<Matchable, MiddlewareHandler[]> = new Map();
+    public currentlyAwaiting: Map<string, AwaitingObject> = new Map();
+    public locals: {[x: string]: any} = {};
 
     constructor(token: string, options: ErisaOptions = {}) {
         super(token, options.erisOptions);
-
-        this.handlers = new Map();
-        this.currentlyAwaiting = new Map();
 
         this.on('*', this.handleEvent('*'));
         this.use('createMessage', awaitMessageHandler);
@@ -107,7 +105,7 @@ export default class Erisa extends Eris.Client {
         return super.emit(event, ...args);
     }
 
-    private handleEvent(ev: string): (...args: any[]) => void {
+    handleEvent(ev: string): (...args: any[]) => void {
         if (ev === '*') return function(event, ...args) {
             const matchingEvents = Array.from(this.handlers.keys()).filter(k => k instanceof RegExp ? k.test(event) : minimatch(event, k as string));
             const handlers = Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]);
