@@ -70,7 +70,7 @@ describe('Middleware handling', () => {
 
                     client.use('foo', ...result);
                     client.disuse('foo', ...result);
-                    expect(client.handlers.get('foo')).to.be.empty;
+                    expect(client.handlers.get('foo')).to.be.undefined;
                 });
         });
 
@@ -81,7 +81,7 @@ describe('Middleware handling', () => {
 
                     client.use('foo', ...result);
                     client.disuse('foo');
-                    expect(client.handlers.get('foo')).to.be.empty;
+                    expect(client.handlers.get('foo')).to.be.undefined;
                 });
         });
 
@@ -94,7 +94,7 @@ describe('Middleware handling', () => {
 
                     client.disuse(...result);
 
-                    for (const ev of events) expect(client.handlers.get(ev)).to.be.empty;
+                    for (const ev of events) expect(client.handlers.get(ev)).to.be.undefined;
                 });
         });
     });

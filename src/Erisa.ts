@@ -46,7 +46,7 @@ export default class Erisa extends Eris.Client {
     disuse(...args) {
         const flattenedArgs = [].concat.apply([], args);
         const removeHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
-            if (!this.handlers.get(ev)) return;
+            if (!this.handlers.get(ev) && ev !== '*') return;
             if (!handlers.length) handlers = this.handlers.get(ev)!;
 
             for (const handler of handlers) {
@@ -54,10 +54,18 @@ export default class Erisa extends Eris.Client {
                     ? Array.from(this.handlers).filter(([_, hndlrs]) => hndlrs.includes(handler))
                     : [[ev, this.handlers.get(ev)!]] as [Matchable, MiddlewareHandler[]][]; // tslint:disable-line
 
-                for (const [event, hndlrs] of ourHandlers) this.handlers.set(event, hndlrs.splice(hndlrs.indexOf(handler), 1));
+                for (const [event, handlers_] of ourHandlers) {
+                    const copied = handlers_.slice(); // Copies `handlers_` to a brand new object, instead of operating on the reference.
+
+                    copied.splice(copied.indexOf(handler), 1);
+
+                    // Clean up as we go, especially when removing `*`.
+                    if (!copied.length) this.handlers.delete(event);
+                    else this.handlers.set(event, copied);
+                }
             }
 
-            if (!this.handlers.get(ev)!.length) {
+            if (this.handlers.get(ev) && !this.handlers.get(ev)!.length) {
                 if (typeof ev === 'string') this.removeAllListeners(ev);
                 this.handlers.delete(ev);
             }
