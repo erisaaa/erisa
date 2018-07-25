@@ -108,7 +108,7 @@ export default class Erisa extends Eris.Client {
     }
 
     emit(event: string | symbol, ...args: any[]): boolean {
-        super.emit('*', event, args);
+        super.emit('*', event, ...args);
 
         return super.emit(event, ...args);
     }

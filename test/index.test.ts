@@ -103,8 +103,9 @@ describe('Middleware handling', () => {
         it('should emit a `*` event on any event, along with the original event', done => {
             let counter = 0;
             function hit() {
+                counter++;
+
                 if (counter === 2) done();
-                else counter++;
             }
 
             client.on('*', hit);
@@ -113,18 +114,14 @@ describe('Middleware handling', () => {
             client.emit('foo');
         });
 
-        it('should provide the original event name as the first argument to the `*` event', done => {
-            client.on('*', ev => {
-                done(expect(ev).to.equal('foo'));
-            });
+        it('should provide the original event name as the first argument to the `*` event', () => {
+            client.on('*', ev => expect(ev).to.equal('foo'));
 
             client.emit('foo');
         });
 
-        it('should provide any provided arguments to the event, to the `*` event after the event name argument', done => {
-            client.on('*', (ev, ...args) => {
-                done(expect(args).to.deep.equal([1, 2, 3]));
-            });
+        it('should provide any provided arguments to the event, to the `*` event after the event name argument', () => {
+            client.on('*', (ev, ...args) => expect(args).to.deep.equal([1, 2, 3]));
 
             client.emit('foo', 1, 2, 3);
         });
