@@ -29,6 +29,7 @@ export interface AwaitingObject {
  * An error that is thrown when an `awaitMessage` call expires.
  */
 export class AwaitTimeout extends Error {
+    /* istanbul ignore next */
     constructor(message) {
         super(message);
         this.name = 'AwaitTimeout';
