@@ -1,4 +1,4 @@
-import {Client} from 'eris';
+import Erisa from '../../';
 import Command from './Command';
 import Context, {PermissionTargets} from './Context';
 import SubCommand from './SubCommand';
@@ -12,7 +12,7 @@ export default class Holder {
     readonly aliases: Map<string, Command> = new Map<string, Command>();
     readonly modules: Map<string, string[]> = new Map<string, string[]>();
 
-    constructor(readonly client: Client) {}
+    constructor(readonly client: Erisa) {}
 
     async load(mod: string): Promise<void> {
         if (this.modules.get(mod)) throw new Error(`Command module '${mod}' is already loaded.`);
