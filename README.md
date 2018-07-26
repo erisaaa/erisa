@@ -8,7 +8,7 @@ This is currently a heavy work-in-progress and nothing is guarenteed to be consi
 ## Basic Example
 #### TypeScript (recommended)
 ```ts
-import Erisa from 'erisa';
+import {Erisa} from 'erisa';
 import {Message} from 'eris'; // For typing
 
 const bot = new Erisa('token');
@@ -26,7 +26,7 @@ bot.connect();
 
 #### JavaScript
 ```js
-const Erisa = require('erisa');
+const {Erisa} = require('erisa');
 
 const bot = new Erisa('token');
 

@@ -1,5 +1,1 @@
-import Erisa from './src/Erisa';
-
-export = {
-    Erisa
-};
+export {default as Erisa} from './src/Erisa';
