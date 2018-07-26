@@ -115,8 +115,8 @@ export default class Erisa extends Eris.Client {
 
     handleEvent(ev: string): (...args: any[]) => void {
         if (ev === '*') return function(event, ...args) {
-            const matchingEvents = Array.from(this.handlers.keys()).filter(k => k instanceof RegExp ? k.test(event) : minimatch(event, k as string));
-            const handlers = Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]);
+            const matchingEvents = Array.from(this.handlers.keys()).filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)) && event !== k);
+            const handlers = [].concat.apply([], Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]));
 
             for (const handler of handlers) handler({event, erisa: this}, ...args);
         }.bind(this);
