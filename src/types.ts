@@ -1,7 +1,11 @@
 import Eris from 'eris';
 import Erisa from './Erisa';
 
-export type MiddlewareHandler = (generalArgs: {event: string; erisa: Erisa}, ...eventArgs: any[]) => Error | void;
+/** A type that is either just the given types, or a Promise that resolves to them. */
+type OptionalAsync<T> = Promise<T> | T;
+
+/** A function that gets passed to Erisa#use to handle incoming events. */
+export type MiddlewareHandler = (generalArgs: {event: string; erisa: Erisa}, ...eventArgs: any[]) => OptionalAsync<Error | void>;
 export type Matchable = string | RegExp;
 
 export interface ErisaOptions {
@@ -13,10 +17,13 @@ export interface AwaitMessageOptions {
     filter(msg: Eris.Message): boolean;
 }
 
-export interface DeferredPromise {
-    promise: Promise<any>;
-    resolve(value?: any): Promise<any>;
-    reject(error?: any): Promise<any>;
+/**
+ * An object represnting a Promise that can be watched and triggered at different places.
+ */
+export interface DeferredPromise<T> {
+    promise: Promise<T>;
+    resolve(value?: T): Promise<T>;
+    reject(error?: T): Promise<T>;
 }
 
 export interface AwaitingObject {

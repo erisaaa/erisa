@@ -92,7 +92,7 @@ export default class Erisa extends Eris.Client {
         });
 
         // Composes an object that resembles a semi-deconstructed promise, so that it can be returned now, and resolved/rejected at a later time.
-        const deferred = {promise, resolve, reject};
+        const deferred: AwaitingObject<Eris.Message> = {promise, resolve, reject};
         const timer = setTimeout(() => {
             deferred.reject(new AwaitTimeout('Message await expired.'));
             this.currentlyAwaiting.delete(id);
