@@ -1,5 +1,5 @@
 import {Constants} from 'eris';
-import Erisa, {MiddlewareHandler} from '../../';
+import Erisa, {MiddlewareHandler} from '../../../dist';
 import Context from './Context';
 import Holder from './Holder';
 
@@ -45,7 +45,7 @@ export default function setup(erisa: Erisa, options: CommandHandlerOptions): Mid
     const contextClass = options.contextClass || defaults.contextClass;
     erisa.locals.commands = new Holder(erisa, options.prefixes);
 
-    if (!erisa.eventNames().includes('rawWS')) erisa.on('rawWS', () => {}); // Needed so that Eris fires rawWS events at all.    
+    if (!erisa.eventNames().includes('rawWS')) erisa.on('rawWS', () => {}); // Needed so that Eris fires rawWS events at all.
 
     return function handler({erisa: client, event}, ...args) {
         // if (event === 'rawWS') {
@@ -57,7 +57,7 @@ export default function setup(erisa: Erisa, options: CommandHandlerOptions): Mid
         // }
 
         if (event === 'ready' && erisa.locals.commands.loadCommands) {
-            
+
         }
     };
 }

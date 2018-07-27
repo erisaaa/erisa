@@ -1,4 +1,4 @@
-import Erisa from '../../';
+import Erisa from '../../../dist';
 import Command from './Command';
 import Context, {PermissionTargets} from './Context';
 import SubCommand from './SubCommand';
