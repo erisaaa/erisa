@@ -2,17 +2,43 @@ import Erisa from '../../';
 import Command from './Command';
 import Context, {PermissionTargets} from './Context';
 import SubCommand from './SubCommand';
+import {default as fs_, promises as fs} from 'fs';
 
 interface Ctor<T> {
     new(...args: any[]): T;
+}
+
+async function walk(dir: string): string[] {
+    const files = await fs.readdir(dir);
+    let ret: string[] = [];
+
+    for (const f of files)
+        if ((await fs.stat(dir + f)).isDirectory()) ret = ret.concat(await walk(`${dir}${f}/`));
+        else ret.push(dir + f);
+
+    return ret;
 }
 
 export default class Holder {
     readonly commands: Map<string, Command> = new Map<string, Command>();
     readonly aliases: Map<string, Command> = new Map<string, Command>();
     readonly modules: Map<string, string[]> = new Map<string, string[]>();
+    public loadCommands: boolean = true;
+    public useCommands: boolean = false;
 
-    constructor(readonly client: Erisa) {}
+    constructor(readonly client: Erisa, public prefixes: string[]) {}
+
+    async loadAll(directory: string, deep: boolean = false): Promise<void> {
+        const files: string[] = await Promise.all(await (deep ? walk(dir) : fs.readdir(dir)))
+            .filter(async f => (await fs.stat(f)).isDirectory()));
+
+        for (const f of files)
+            try {
+                await this.load(f);
+            } catch(err) {
+                // TODO: integrate with the logger module if it exists.
+            }
+    }
 
     async load(mod: string): Promise<void> {
         if (this.modules.get(mod)) throw new Error(`Command module '${mod}' is already loaded.`);
