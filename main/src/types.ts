@@ -20,14 +20,14 @@ export interface AwaitMessageOptions {
 /**
  * An object represnting a Promise that can be watched and triggered at different places.
  */
-export interface DeferredPromise<T> {
+export interface DeferredPromise<T, U> {
     promise: Promise<T>;
-    resolve(value?: T): Promise<T>;
-    reject(error?: T): Promise<T>;
+    resolve(value?: T): void;
+    reject(error?: U): void;
 }
 
 export interface AwaitingObject {
-    p: DeferredPromise;
+    p: DeferredPromise<Eris.Message, AwaitTimeout>;
     timer: NodeJS.Timer;
     filter(msg: Eris.Message): boolean;
 }

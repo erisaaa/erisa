@@ -1,7 +1,7 @@
 import Eris from 'eris';
 import {default as minimatch} from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
-import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler} from './types';
+import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler, DeferredPromise} from './types';
 
 export default class Erisa extends Eris.Client {
     public handlers: Map<Matchable, MiddlewareHandler[]> = new Map();
@@ -92,7 +92,7 @@ export default class Erisa extends Eris.Client {
         });
 
         // Composes an object that resembles a semi-deconstructed promise, so that it can be returned now, and resolved/rejected at a later time.
-        const deferred: AwaitingObject<Eris.Message> = {promise, resolve, reject};
+        const deferred: DeferredPromise<Eris.Message, AwaitTimeout> = {promise, resolve, reject};
         const timer = setTimeout(() => {
             deferred.reject(new AwaitTimeout('Message await expired.'));
             this.currentlyAwaiting.delete(id);

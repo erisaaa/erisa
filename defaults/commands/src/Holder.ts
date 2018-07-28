@@ -8,7 +8,7 @@ interface Ctor<T> {
     new(...args: any[]): T;
 }
 
-async function walk(dir: string): string[] {
+async function walk(dir: string): Promise<string[]> {
     const files = await fs.readdir(dir);
     let ret: string[] = [];
 
@@ -35,7 +35,7 @@ export default class Holder {
         for (const f of files)
             try {
                 await this.load(f);
-            } catch(err) {
+            } catch (err) {
                 // TODO: integrate with the logger module if it exists.
             }
     }
