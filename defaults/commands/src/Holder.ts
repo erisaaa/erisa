@@ -13,8 +13,8 @@ async function walk(dir: string): Promise<string[]> {
     let ret: string[] = [];
 
     for (const f of files)
-        if ((await fs.stat(dir + f)).isDirectory()) ret = ret.concat(await walk(`${dir}${f}/`));
-        else ret.push(dir + f);
+        if ((await fs.stat(`${dir}${f}`)).isDirectory()) ret = ret.concat(await walk(`${dir}${f}/`));
+        else ret.push(`${dir}${f}`);
 
     return ret;
 }
