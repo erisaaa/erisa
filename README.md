@@ -6,7 +6,8 @@ Erisa is a Discord bot framework built upon [Eris](https://github.com/abalabahah
 This is currently a heavy work-in-progress and nothing is guarenteed to be consistent and stable until v1.
 
 ## Where's the code?
-This repository is managed as a [monorepo](https://danluu.com/monorepo/) in order to make managing the various parts a bit simpler. As such, the various packages for Erisa is distributed around the place sorta. Here's a list of the current packages managed by this repository, and their locations.
+This repository is managed as a [monorepo](https://danluu.com/monorepo/) in order to make managing the various parts a bit simpler.
+As such, the various packages for Erisa is distributed around the place sorta. Here's a list of the current packages managed by this repository, and their locations.
 
 - `erisa`: Found in `/main`. This contains the code for the core package.
 - `@erisa/commands`: Found in `/defaults/commands`. This contains the code for the command system package.
