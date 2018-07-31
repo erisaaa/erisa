@@ -2,7 +2,7 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "noEmit": true,
-        "baseUrl": "../..",
+        "baseUrl": "..",
         "paths": {
             "erisa": ["main/index.ts"],
             "@erisa/commands": ["defaults/commands/index.ts"]
