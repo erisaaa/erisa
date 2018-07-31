@@ -3,7 +3,7 @@ import {default as minimatch} from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
 import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler, DeferredPromise} from './types';
 
-export default class Erisa extends Eris.Client {
+export class Erisa extends Eris.Client {
     public handlers: Map<Matchable, MiddlewareHandler[]> = new Map();
     public currentlyAwaiting: Map<string, AwaitingObject> = new Map();
     public locals: {[x: string]: any} = {};
