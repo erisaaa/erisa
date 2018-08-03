@@ -3,5 +3,7 @@
     "defaults/*",
     "main/"
   ],
-  "version": "independent"
+  "version": "independent",
+  "npmClient": "yarn",
+  "useWorkspaces": true
 }
