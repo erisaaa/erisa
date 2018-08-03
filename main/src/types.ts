@@ -8,6 +8,9 @@ type OptionalAsync<T> = Promise<T> | T;
 export type MiddlewareHandler = (generalArgs: {event: string; erisa: Erisa}, ...eventArgs: any[]) => OptionalAsync<Error | void>;
 export type Matchable = string | RegExp;
 
+/** An object considered to be able to be formatted by Erisa#format. */
+export type Formattable = Eris.Member | Eris.User | Eris.ExtendedUser | Eris.Role | Eris.Guild | Eris.Channel;
+
 export interface ErisaOptions {
     erisOptions?: Eris.ClientOptions;
 }
