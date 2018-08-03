@@ -20,6 +20,9 @@ async function walk(dir: string): Promise<string[]> {
     return ret;
 }
 
+/**
+ * An object for containing a bunch of commands with methods to load and run them.
+ */
 export default class Holder {
     readonly commands: Map<string, Command> = new Map<string, Command>();
     readonly aliases: Map<string, Command> = new Map<string, Command>();
@@ -29,6 +32,12 @@ export default class Holder {
 
     constructor(readonly client: Erisa, public prefixes: string[]) {}
 
+    /**
+     * Loads all the commands found within a given directory.
+     *
+     * @param directory Directory to find commands in.
+     * @param deep Whether to look in nested directories for more commands.
+     */
     async loadAll(directory: string, deep: boolean = false): Promise<void> {
         const files: string[] = await Promise.all(await (deep ? walk(dir) : fs.readdir(dir)))
             .filter(async f => (await fs.stat(f)).isDirectory()));
@@ -41,6 +50,11 @@ export default class Holder {
             }
     }
 
+    /**
+     * Attempts to load commands from a given module.
+     *
+     * @param mod Path of a module containing commands.
+     */
     async load(mod: string): Promise<void> {
         if (this.modules.get(mod)) throw new Error(`Command module '${mod}' is already loaded.`);
 
@@ -86,6 +100,11 @@ export default class Holder {
         }
     }
 
+    /**
+     * Removes all loaded commands from a given module.
+     *
+     * @param mod Path of the module to unload commands from.
+     */
     unload(mod: string): void {
         if (!this.modules.get(mod)) throw new Error(`Command module '${mod} isn't loaded.`);
 
@@ -98,6 +117,11 @@ export default class Holder {
         delete require.cache[require.resolve(mod)];
     }
 
+    /**
+     * Attempts to reload all commands in a given module.
+     *
+     * @param mod Path of the module to reload.
+     */
     reload(mod: string): void {
         // Will implicitly load the module if it hasn't been so already (this if will be false and fall through).
         if (this.modules.get(mod)) this.unload(mod);
@@ -105,6 +129,11 @@ export default class Holder {
         this.load(mod);
     }
 
+    /**
+     * Attempts to run a command based on a given context.
+     *
+     * @param ctx Context to run from.
+     */
     async run(ctx: Context): Promise<void> {
         let cmd = this.commands.get(ctx.cmd);
 
@@ -112,8 +141,8 @@ export default class Holder {
 
         if (ctx.args.length)
             for (const arg of ctx.args)
-            if (cmd.subcommands.length && cmd.subcommands.find(sub => sub.name === arg))
-                cmd = cmd.subcommands.find(sub => sub.name === arg)!;
+                if (cmd.subcommands.length && cmd.subcommands.find(sub => sub.name === arg))
+                    cmd = cmd.subcommands.find(sub => sub.name === arg)!;
 
         if (cmd.ownerOnly && ctx.author.id === this.client.extras.owner)
             await cmd.main(ctx);
@@ -133,7 +162,14 @@ export default class Holder {
         }
     }
 
-    handlePermissions(cmd: Command, ctx: Context): [boolean] | [boolean, string, string] {
+    /**
+     * Determines whether or not a context matches the permission for its command.
+     *
+     * @param cmd Command to check the context against.
+     * @param ctx Context to compare with the command.
+     * @returns First item is a boolean for whether or not all the checks are met. If false, the second item is the missing scope, and the third item is the missing permission.
+     */
+    handlePermissions(cmd: Command, ctx: Context): [true] | [false, string, string] {
         if (!cmd.permissions) return [true];
 
         const permChecks = {
@@ -157,15 +193,15 @@ export default class Holder {
 
         const zip = rows => rows[0].map((_, c) => rows.map(row => row[c]));
         const zipped = [0, 1, 2].map(v => zip([Object.values(cmd.permissions)[v], Object.values(permChecks)[v]]));
-        const allEqual = zipped.reduce((m, v) => m && v.reduce((n, [x, y]) => n && x === y));
+        const allEqual = zipped.reduce((m, v) => m && v.reduce((n, [x, y]) => n && x === y)); // Determines whether all the requested permissions are met.
 
         if (allEqual) return [true];
         else {
-            const unequalField = zipped.find(v => v.find(([x, y]) => x !== y));
-            const missingPermission = unequalField.find(([x, y]) => x !== y);
-            const missingField = Object.keys(cmd.permissions)[zipped.indexOf(unequalField)];
+            const unequalScope = zipped.find(v => v.find(([x, y]) => x !== y)); // Finds the first scope that has an unmet permission.
+            const missingPermission = unequalScope.find(([x, y]) => x !== y); // Get the permission that is missing.
+            const missingScope = Object.keys(cmd.permissions)[zipped.indexOf(unequalScope)]; // Find the scope that has the missing permission.
 
-            return [false, missingField, missingPermission];
+            return [false, missingScope, missingPermission];
         }
     }
 
