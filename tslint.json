@@ -134,7 +134,6 @@
         "interface-over-type-literal": true,
         "jsdoc-format": [true, "check-multiline-start"],
         "match-default-export-name": true,
-        "newline-before-return": true,
         "newline-per-chained-call": false, // maybe enable this sometime in the future
         "new-parens": true,
         "no-angle-bracket-type-assertion": false,
