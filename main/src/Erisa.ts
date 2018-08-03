@@ -3,10 +3,16 @@ import {default as minimatch} from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
 import {AwaitTimeout, AwaitingObject, AwaitMessageOptions, ErisaOptions, Matchable, MiddlewareHandler, DeferredPromise} from './types';
 
+/**
+ * The main Erisa client.
+ */
 export class Erisa extends Eris.Client {
+    /** Collection containing the functions used to handle events. */
     public handlers: Map<Matchable, MiddlewareHandler[]> = new Map();
+    /** Collection containing objects for messages that are currently being waited for. */
     public currentlyAwaiting: Map<string, AwaitingObject> = new Map();
-    public locals: {[x: string]: any} = {};
+    /** A regular object intended to store extensions from middleware, such as a command container. */
+    public extensions: {[x: string]: any} = {};
 
     constructor(token: string, options: ErisaOptions = {}) {
         super(token, options.erisOptions);
@@ -15,7 +21,21 @@ export class Erisa extends Eris.Client {
         this.use('createMessage', awaitMessageHandler);
     }
 
+    /**
+     * Registers global middleware to the client.
+     *
+     * @param handlers An array of functions to run on any event.
+     * @returns The current client instance.
+     */
     use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+
+    /**
+     * Registers middleware for specific events to the client.
+     *
+     * @param events The events to apply the handlers to.
+     * @param handlers An array of functions to run for the provided events.
+     * @returns The current client instance.
+     */
     use(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
 
     use(...args) {
@@ -39,8 +59,29 @@ export class Erisa extends Eris.Client {
         return this;
     }
 
+    /**
+     * Removes the provided middleware from the events given.
+     *
+     * @param events The events to remove the middleware from.
+     * @param handlers The specific middleware to remove.
+     * @returns The current client instance.
+     */
     disuse(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+
+    /**
+     * Removes all middleware from the events given.
+     *
+     * @param events The events to clear middleware from.
+     * @returns The current client instance.
+     */
     disuse(events: Matchable | Matchable[]): this;
+
+    /**
+     * Removes the provided middleware from all events they exist on.
+     *
+     * @param handlers The middleware functions to remove.
+     * @returns The current client instance.
+     */
     disuse(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
 
     disuse(...args) {
@@ -107,12 +148,26 @@ export class Erisa extends Eris.Client {
         return deferred.promise;
     }
 
+    /**
+     * Emits the provided event with the provided arguments, if any.
+     * Also emits a wildcard "*" event for internal use.
+     *
+     * @param event Event to emit.
+     * @param args Arguments for the event.
+     * @returns `true` if the event had listeners, `false` otherwise.
+     */
     emit(event: string | symbol, ...args: any[]): boolean {
         super.emit('*', event, ...args);
 
         return super.emit(event, ...args);
     }
 
+    /**
+     * Creates a function applied to `client.on` in order to prevent overload of event listeners.
+     *
+     * @param ev Event to create a handler function for.
+     * @returns Handler function.
+     */
     handleEvent(ev: string): (...args: any[]) => void {
         if (ev === '*') return function(event, ...args) {
             const matchingEvents = Array.from(this.handlers.keys()).filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)) && event !== k);

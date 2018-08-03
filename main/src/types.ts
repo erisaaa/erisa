@@ -18,7 +18,7 @@ export interface AwaitMessageOptions {
 }
 
 /**
- * An object represnting a Promise that can be watched and triggered at different places.
+ * An object representing a Promise that can be watched and triggered at different places.
  */
 export interface DeferredPromise<T, U> {
     promise: Promise<T>;
