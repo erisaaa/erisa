@@ -2,7 +2,7 @@
 
 import 'mocha';
 import {expect} from 'chai';
-import {Erisa} from 'erisa';
+import {Erisa} from 'erisa_';
 
 type VoidFunc = () => void;
 

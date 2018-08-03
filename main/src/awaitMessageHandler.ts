@@ -1,5 +1,5 @@
 import Eris from 'eris';
-import Erisa from './erisa';
+import {Erisa} from './erisa';
 
 export default function awaitMessageHandler({erisa}: {erisa: Erisa}, msg: Eris.Message): void {
     const id = msg.channel.id + msg.author.id;

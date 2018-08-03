@@ -7,5 +7,9 @@
         "allowSyntheticDefaultImports": true,
         "strictNullChecks": true,
         "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+            "erisa_": ["main/"]
+        }
     }
 }

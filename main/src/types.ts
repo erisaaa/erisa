@@ -1,5 +1,5 @@
 import Eris from 'eris';
-import Erisa from './Erisa';
+import {Erisa} from './Erisa';
 
 /** A type that is either just the given types, or a Promise that resolves to them. */
 type OptionalAsync<T> = Promise<T> | T;
