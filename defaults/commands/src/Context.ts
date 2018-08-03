@@ -29,7 +29,10 @@ export default class Context extends Message {
     }
 
     hasPermission(permission: string, target: PermissionTargets = PermissionTargets.Self): boolean {
-        if (!Object.keys(Constants.Permissions).includes(permission)) return false;
+        if (!Object.keys(Constants.Permissions).includes(permission)) {
+            if (this.client.extensions.logger) this.client.extensions.logger.dispatch('warn', `Unknown permission "${permission}"`);
+            return true;
+        }
 
         switch (target) {
             case PermissionTargets.Self:

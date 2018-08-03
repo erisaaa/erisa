@@ -1,8 +1,9 @@
-import Erisa from '../../../dist';
+import {default as fs_, promises as fs} from 'fs';
+import {Erisa} from 'erisa';
 import Command from './Command';
+import {PermissionStrings} from './Constants';
 import Context, {PermissionTargets} from './Context';
 import SubCommand from './SubCommand';
-import {default as fs_, promises as fs} from 'fs';
 
 interface Ctor<T> {
     new(...args: any[]): T;
@@ -109,14 +110,27 @@ export default class Holder {
 
         if (!cmd) return;
 
-        if (ctx.args.length) for (const arg of ctx.args)
+        if (ctx.args.length)
+            for (const arg of ctx.args)
             if (cmd.subcommands.length && cmd.subcommands.find(sub => sub.name === arg))
                 cmd = cmd.subcommands.find(sub => sub.name === arg)!;
 
         if (cmd.ownerOnly && ctx.author.id === this.client.extras.owner)
             await cmd.main(ctx);
-        else if (!cmd.ownerOnly && this.handlePermissions(cmd, ctx))
-            await cmd.main(ctx);
+        else if (!cmd.ownerOnly) {
+            const perms = this.handlePermissions(cmd, ctx);
+
+            if (perms[0]) await cmd.main(ctx);
+            else {
+                const [, field, permission] = perms as [false, PermissionTargets, string];
+                const permString = PermissionStrings[permission];
+                const msg = (field === PermissionTargets.Self || !ctx.hasPermission(permission))
+                    ? `I am missing the **${permString}** permission.`
+                    : `You are missing the **${permString}** Permission.`;
+
+                await ctx.send(msg);
+            }
+        }
     }
 
     handlePermissions(cmd: Command, ctx: Context): [boolean] | [boolean, string, string] {
