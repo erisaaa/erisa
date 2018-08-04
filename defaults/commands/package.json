@@ -7,7 +7,11 @@
   "author": "Ovyerus <iamovyerus@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "lint": "tslint -p . -c ../../tslint.json"
+    "lint": "tslint -p . -c ../../tslint.json",
+    "compile": "tsc -p .",
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run compile",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "eris": "^0.8.6"
