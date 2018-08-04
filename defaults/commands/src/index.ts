@@ -1,5 +1,5 @@
 import {Constants} from 'eris';
-import Erisa, {MiddlewareHandler} from '../../../dist';
+import {Erisa, MiddlewareHandler} from 'erisa';
 import Context from './Context';
 import Holder from './Holder';
 
