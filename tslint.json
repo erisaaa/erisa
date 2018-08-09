@@ -172,7 +172,7 @@
             "avoid-templates",
             "jsx-double"
         ],
-        "return-undefined": true,
+        "return-undefined": false,
         "semicolon": {"severity": "warning", "options": ["always"]},
         "space-before-function-paren": [
             true,
