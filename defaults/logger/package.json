@@ -1,7 +1,7 @@
 {
     "name": "@erisa/logger",
     "version": "0.0.1",
-    "description": "The default logging module for Erisa.\"",
+    "description": "The default logging module for Erisa.",
     "main": "index.js",
     "repository": "https://github.com/Ovyerus/erisa",
     "author": "Ovyerus <iamovyerus@gmail.com>",

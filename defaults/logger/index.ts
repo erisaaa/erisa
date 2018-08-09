@@ -1,7 +1,8 @@
 import {Erisa, MiddlewareHandler} from 'erisa';
+import tc from 'turbocolor';
 
 type DefaultListeners = 'ready' | 'error' | 'warn' | 'guildCreate' | 'guildDelete';
-interface LoggerLevel {
+export interface LoggerLevel {
     tagText: string;
     textFunc(text: string): string;
 }
@@ -12,7 +13,7 @@ interface LoggerLevel {
  * @param erisa An Erisa instance to define extensions for..
  * @param defaultListeners Whether or not to register a listener for some default events. If an array, it is an array of events to log, with the values being a `DefaultListeners`.
  */
-export function logger(erisa: Erisa, defaultListeners: boolean | DefaultListeners[] = true): MiddlewareHandler | void {
+export default function logger(erisa: Erisa, defaultListeners: boolean | DefaultListeners[] = true): MiddlewareHandler | void {
     if (erisa.extensions.logger) return;
 
     erisa.extensions.logger = {
@@ -27,22 +28,22 @@ export function logger(erisa: Erisa, defaultListeners: boolean | DefaultListener
         levels: {
             error: {
                 tagText: tc.bgRed('[ERROR]'),
-                textFunc: tc.red.bold
+                textFunc: str => tc.red.bold(str)
             },
             warn: {
                 tagText: tc.black.bgYellow('[WARN]'),
-                textFunc: tc.yellow.bold
+                textFunc: str => tc.yellow.bold(str)
             },
             info: {
                 tagText: tc.black.bgGreen('[INFO]'),
-                textFunc: tc.green.bold
+                textFunc: str => tc.green.bold(str)
             }
         } as {[x: string]: LoggerLevel}
     };
 
     if (!defaultListeners) return;
     else return function handler({erisa: client, event}, ...args) {
-        if (!defaultListeners.includes(event)) return;
+        if (Array.isArray(defaultListeners) && !defaultListeners.includes(event as DefaultListeners)) return;
 
         const logger_ = client.extensions.logger;
 
