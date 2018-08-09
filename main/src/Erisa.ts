@@ -27,7 +27,7 @@ export class Erisa extends Eris.Client {
      * @param handlers An array of functions to run on any event.
      * @returns The current client instance.
      */
-    use(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    use(...handlers: (MiddlewareHandler | MiddlewareHandler[] | void)[]): this;
 
     /**
      * Registers middleware for specific events to the client.
@@ -36,10 +36,10 @@ export class Erisa extends Eris.Client {
      * @param handlers An array of functions to run for the provided events.
      * @returns The current client instance.
      */
-    use(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    use(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[] | void)[]): this;
 
     use(...args) {
-        const flattenedArgs = [].concat.apply([], args);
+        const flattenedArgs = [].concat.apply([], args).filter(v => v);
         const setHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
             if (!this.handlers.get(ev)) this.handlers.set(ev, handlers);
             else this.handlers.set(ev, this.handlers.get(ev)!.concat([], handlers)); // typescript is dumb here :(
@@ -50,7 +50,7 @@ export class Erisa extends Eris.Client {
         if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true)) setHandlers('*', flattenedArgs);
         else {
             let [events, ...handlers] = args;
-            handlers = [].concat.apply([], handlers);
+            handlers = [].concat.apply([], handlers).filter(v => v); // Clean out void functions.
             events = typeof events === 'string' ? [events] : events;
 
             for (const ev of events) setHandlers(ev, handlers);
