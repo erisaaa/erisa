@@ -2,4 +2,4 @@
 --require source-map-support/register
 --require tsconfig-paths/register
 --full-trace
-test/**/*.test.ts
+./test/**/*.test.ts
