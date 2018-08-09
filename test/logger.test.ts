@@ -1,17 +1,11 @@
 /* tslint:disable no-unused-expression */
 
 import 'mocha';
-import tc from 'turbocolor';
 import {expect} from 'chai';
 import {stdout} from 'test-console';
 import {Erisa} from 'erisa_';
 import logger, {LoggerLevel} from '@erisa_/logger';
-
-const testString = 'This is a test.';
-const customLevel = {
-    tagText: tc.bgCyan('[FOO]'),
-    textFunc: str => tc.cyan.bold(testString)
-};
+import {testString, customLevel} from './consts';
 
 let client: Erisa = new Erisa('nothing');
 

@@ -3,27 +3,11 @@
 import 'mocha';
 import {expect} from 'chai';
 import {Erisa} from 'erisa_';
+import {events, mixedHandlers, handlers, tests} from './consts';
 
 type VoidFunc = () => void;
 
 let client = new Erisa('nothing');
-const events = ['foo', 'bar', 'foobar'];
-const handlers = [
-    'foo',
-    'bar',
-    'foobar',
-    'faz',
-    'baz',
-    'fazbaz',
-    'foobaz'
-].map(v => () => {v}); // tslint:disable-line
-const mixedHandlers = [...handlers.slice(0, 3), [handlers[3], handlers[4]], handlers[5], [handlers[6]]];
-const tests = {
-    'single handler': handlers[0],
-    'handler array': handlers,
-    'rest handlers': handlers,
-    'mix of handlers and arrays': mixedHandlers
-};
 
 beforeEach(() => {
     // Reset client for each test.
