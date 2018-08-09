@@ -11,6 +11,7 @@ As such, the various packages for Erisa is distributed around the place sorta. H
 
 - `erisa`: Found in `/main`. This contains the code for the core package.
 - `@erisa/commands`: Found in `/defaults/commands`. This contains the code for the command system package.
+- `@erisa/logger`: Founud in `/defaults/logger`. This contains the code for the logging package.
 
 ## Ok, how do I do things?
 I recommened installing [yarn](https://yarnpkg.com) if you haven't already, as this repository has stuff setup for its workspace feature already, and it's also just better than NPM in general.
