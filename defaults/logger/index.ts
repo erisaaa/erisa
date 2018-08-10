@@ -52,7 +52,7 @@ export default function logger(erisa: Erisa, defaultListeners: boolean | Default
                 logger_.dispatch('info', `Logged in as ${client.user.username}`);
                 break;
             case 'error':
-                logger_.dispatch('error', `Discord error for shard ${args[1]}:`, args[0]);
+                logger_.dispatch('error', `Discord error for shard ${args[1]}: ${args[0]}`);
                 break;
             case 'warn':
                 logger_.dispatch('warn', `Discord warning for shard ${args[1]}: ${args[0]}`);
