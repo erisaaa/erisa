@@ -3,9 +3,9 @@
 import 'mocha';
 import {expect} from 'chai';
 import {stdout} from 'test-console';
-import {Erisa} from 'erisa_';
+import {Erisa, MiddlewareHandler} from 'erisa_';
 import logger, {LoggerLevel} from '@erisa_/logger';
-import {testString, customLevel} from './consts';
+import {testString, customLevel, logEvents} from './consts';
 
 let client: Erisa = new Erisa('nothing');
 
@@ -54,5 +54,52 @@ describe('logger', () => {
 
         client.use(logger(client));
         expect(client.extensions.logger).to.equal(loggerExt);
+    });
+
+    describe('defaultListeners', () => {
+        it('should not return a middleware-function when false', () => {
+            expect(logger(new Erisa('nothing'), false)).to.be.undefined;
+        });
+
+        describe('logging events', () => {
+            const client2 = new Erisa('nothing');
+            const eventFunc = logger(client2) as MiddlewareHandler; // Type assertion is needed because TypeScript doesn't understand the below call is a check, so the call below fails.
+
+            expect(eventFunc).to.be.a('function');
+
+            for (const [event, [before, args, expected, level]] of Object.entries(logEvents))
+                specify(event, () => {
+                    const lvl = client2.extensions.logger.levels[level];
+                    const result = stdout.inspectSync(() => {
+                        before(client2);
+                        eventFunc({erisa: client2, event}, ...args);
+                    });
+
+                    expect(result.length).to.equal(1);
+                    expect(result[0].trim()).to.equal(`${lvl.tagText} ${lvl.textFunc(expected)}`);
+                });
+
+            it("shouldn't log anything when given an event that isn't a default one", () => {
+                const result = stdout.inspectSync(() => eventFunc({erisa: client2, event: 'foo'}));
+
+                expect(result.length).to.equal(0);
+            });
+
+            const client3 = new Erisa('nothing');
+            const eventFunc2 = logger(client3, ['ready']) as MiddlewareHandler;
+
+            it('should only log the `ready` event, and not do anything on other ones', () => {
+                const [before, args, expected, level] = logEvents.ready;
+                const lvl = client3.extensions.logger.levels.info;
+                const result = stdout.inspectSync(() => {
+                    before(client3);
+                    eventFunc2({erisa: client3, event: 'ready'}, ...args);
+                    eventFunc2({erisa: client3, event: 'guildCreate'});
+                });
+
+                expect(result.length).to.equal(1);
+                expect(result[0].trim()).to.equal(`${lvl.tagText} ${lvl.textFunc(expected)}`);
+            });
+        });
     });
 });
