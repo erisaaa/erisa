@@ -1,8 +1,8 @@
 /*
  * Export variables for the various tests in order to have them cleaned up a bit.
  */
+import Eris from 'eris';
 import tc from 'turbocolor';
-import {ExtendedUser} from 'eris';
 import {Erisa} from 'erisa_';
 
 // index.test.ts
@@ -35,7 +35,7 @@ export const logEvents: {
 } = {
     ready: [
         client => {
-            const tmp = new ExtendedUser({id: '420blazeit'}, client);
+            const tmp = new Eris.ExtendedUser({id: '420blazeit'}, client);
             tmp.username = 'Test';
             client.user = tmp;
         },

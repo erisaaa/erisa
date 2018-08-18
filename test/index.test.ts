@@ -1,13 +1,18 @@
 /* tslint:disable no-unused-expression */
 
 import 'mocha';
+import Eris from 'eris';
 import {expect} from 'chai';
-import {Erisa} from 'erisa_';
+import {Erisa, Formattable} from 'erisa_';
 import {events, mixedHandlers, handlers, tests} from './consts';
 
 type VoidFunc = () => void;
 
 let client = new Erisa('nothing');
+
+function curry(func, ...args) {
+    return () => func(...args);
+}
 
 beforeEach(() => {
     // Reset client for each test.
@@ -134,6 +139,82 @@ describe('erisa', () => {
                 client.on('*', (ev, ...args) => expect(args).to.deep.equal([1, 2, 3]));
 
                 client.emit('foo', 1, 2, 3);
+            });
+        });
+
+        describe('#format', () => {
+            it('should throw an error when given an unknown object', () => {
+                const fakeClass = class {};
+
+                expect(curry(client.format, null as any)).to.throw(TypeError, 'Unable to format object: null');
+                expect(curry(client.format, undefined as any)).to.throw(TypeError, 'Unable to format object: undefined');
+                expect(curry(client.format, false as any)).to.throw(TypeError, 'Unable to format object: false');
+                expect(curry(client.format, new fakeClass() as any)).to.throw(TypeError, `Unable to format object: ${fakeClass.name}`);
+            });
+
+            describe('formatting objects', () => {
+                describe('members', () => {
+                    const mem = new Eris.Member({nick: 'Foo'} as any, null as any);
+                    mem.user = {username: 'foo', discriminator: '0000'} as any;
+
+                    it("should show the member's nickname", () => {
+                        expect(client.format(mem)).to.equal('Foo#0000');
+                    });
+
+                    it("should show the member's username", () => {
+                        mem.nick = undefined;
+
+                        expect(client.format(mem)).to.equal('foo#0000');
+                    });
+
+                    it("shouldn't show the member's discriminator", () => {
+                        mem.nick = 'Foo';
+
+                        expect(client.format(mem, true)).to.equal('Foo');
+                    });
+                });
+
+                describe('users', () => {
+                    const user = new Eris.User({username: 'foo', discriminator: '0000'} as any, client);
+
+                    it("should show the user's full tag", () => {
+                        expect(client.format(user)).to.equal('foo#0000');
+                    });
+
+                    it("shouldn't show the user's discriminator", () => {
+                        expect(client.format(user, true)).to.equal('foo');
+                    });
+                });
+
+                describe('roles', () => {
+                    const role = new Eris.Role({id: '1234567890', name: 'foo', mentionable: true}, {} as any);
+
+                    it("should show the role's mention", () => {
+                        expect(client.format(role)).to.equal(role.mention);
+                    });
+
+                    it("should only show the role's name", () => {
+                        role.mentionable = false;
+
+                        expect(client.format(role)).to.equal('foo');
+                    });
+                });
+
+                describe('channels', () => {
+                    const channel = new Eris.Channel({id: '1234567890'});
+
+                    it("should show the channel's mention", () => {
+                        expect(client.format(channel)).to.equal(channel.mention);
+                    });
+                });
+
+                describe('guilds', () => {
+                    const guild = new Eris.Guild({name: 'foo'} as any, client);
+
+                    it("should show the guild's name", () => {
+                        expect(client.format(guild)).to.equal('foo');
+                    });
+                });
             });
         });
     });
