@@ -30,7 +30,7 @@ export default class Holder {
     public loadCommands: boolean = true;
     public useCommands: boolean = false;
 
-    constructor(readonly client: Erisa, public prefixes: string[]) {}
+    constructor(readonly client: Erisa, public prefixes: (string | RegExp)[], public owner: string) {}
 
     /**
      * Loads all the commands found within a given directory.
@@ -78,38 +78,38 @@ export default class Holder {
      * @returns The constructed command, in case it's needed.
      */
     async add(command: Ctor<Command>, mod: string): Promise<Command> {
-            const cmd = new command(this.client);
+        const cmd = new command(this.client);
 
-            if (cmd.init) await cmd.init();
+        if (cmd.init) await cmd.init();
 
-            cmd.name = cmd.name ? cmd.name.toLowerCase() : command.name.toLowerCase();
+        cmd.name = cmd.name ? cmd.name.toLowerCase() : command.name.toLowerCase();
 
-            if (!cmd.overview) throw new Error(`Command '${cmd.name}' in module '${mod}' is missing 'overview' property`);
-            if (!cmd.main) throw new Error(`Command '${cmd.name}' in module '${mod}' is missing 'main' method.`);
+        if (!cmd.overview) throw new Error(`Command '${cmd.name}' in module '${mod}' is missing 'overview' property`);
+        if (!cmd.main) throw new Error(`Command '${cmd.name}' in module '${mod}' is missing 'main' method.`);
 
-            const cmdMethods = Object.getOwnPropertyNames(cmd.constructor.prototype)
-                .filter(v => !['constructor', 'main', 'init'].includes(v));
+        const cmdMethods = Object.getOwnPropertyNames(cmd.constructor.prototype)
+            .filter(v => !['constructor', 'main', 'init'].includes(v));
 
-            for (const subcommand of cmdMethods) {
-                const result = cmd[subcommand]();
+        for (const subcommand of cmdMethods) {
+            const result = cmd[subcommand]();
 
-                if (!(result instanceof SubCommand)) continue;
+            if (!(result instanceof SubCommand)) continue;
 
-                cmd.subcommands.push(result);
-            }
+            cmd.subcommands.push(result);
+        }
 
-            this.commands.set(cmd.name, cmd);
+        this.commands.set(cmd.name, cmd);
 
-            if (!this.modules.get(mod)) this.modules.set(mod, [cmd.name]);
-            else this.modules.set(mod, this.modules.get(mod)!.concat(cmd.name));
+        if (!this.modules.get(mod)) this.modules.set(mod, [cmd.name]);
+        else this.modules.set(mod, this.modules.get(mod)!.concat(cmd.name));
 
-            if (cmd.aliases) for (const alias of cmd.aliases) {
-                this.aliases.set(alias, this.commands.get(cmd.name)!);
-                this.modules.set(mod, this.modules.get(mod)!.concat(alias));
-            }
+        if (cmd.aliases) for (const alias of cmd.aliases) {
+            this.aliases.set(alias, this.commands.get(cmd.name)!);
+            this.modules.set(mod, this.modules.get(mod)!.concat(alias));
+        }
 
         return cmd;
-        }
+    }
 
     /**
      * Removes all loaded commands from a given module.
@@ -219,8 +219,29 @@ export default class Holder {
         }
     }
 
-    get(mod: string): Command | undefined {
-        return this.aliases.get(mod) || this.commands.get(mod);
+    testPrefix(content: string): [false] | [true, string] {
+        let ret: [false] | [true, string] = [false];
+
+        for (const prefix of this.prefixes)
+            if (typeof prefix === 'string' && content.startsWith(prefix)) {
+                ret = [true, content.slice(prefix.length).trim()];
+                break;
+            } else if (prefix instanceof RegExp && prefix.test(content) && content.match(prefix)![1]) {
+                ret = [true, content.match(prefix)![1].trim()];
+                break;
+            }
+
+        return ret;
+    }
+
+    /**
+     * Gets a mod either by an alias or normal name.
+     * 
+     * @param cmd Command to try and get.
+     * @returns The matching command if it exists.
+     */
+    get(cmd: string): Command | undefined {
+        return this.aliases.get(cmd) || this.commands.get(cmd);
     }
 
     forEach(cb: (value: Command, key: string, map: Map<string, Command>) => void): void {
