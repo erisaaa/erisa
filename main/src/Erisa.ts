@@ -180,18 +180,20 @@ export class Erisa extends Eris.Client {
      * @param ev Event to create a handler function for.
      * @returns Handler function.
      */
-    handleEvent(ev: string): (...args: any[]) => void {
-        if (ev === '*') return function(event, ...args) {
-            const matchingEvents = Array.from(this.handlers.keys()).filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)) && event !== k);
-            const handlers = [].concat.apply([], Array.from(this.handlers.entries()).filter(([k]) => matchingEvents.includes(k)).map(v => v[1]));
+    handleEvent(ev: string): (...args: any[]) => Promise<void> {
+        if (ev === '*') return async function(event, ...args) {
+            const matchingEvents = Array.from(this.handlers.keys())
+                .filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)) && event !== k);
+            const handlers = [].concat.apply([], Array.from(this.handlers.entries())
+                .filter(([k]) => matchingEvents.includes(k)).map(v => v[1]));
 
-            for (const handler of handlers) handler({event, erisa: this}, ...args);
+            for (const handler of handlers) await handler({event, erisa: this}, ...args);
         }.bind(this);
 
-        return function(...args) {
+        return async function(...args) {
             if (!this.handlers.get(ev)) return;
 
-            for (const handler of this.handlers.get(ev)) handler(ev, ...args);
+            for (const handler of this.handlers.get(ev)) await handler(ev, ...args);
         }.bind(this);
     }
 
