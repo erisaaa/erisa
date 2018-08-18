@@ -212,7 +212,7 @@ export class Erisa extends Eris.Client {
         else if (obj instanceof Eris.Role) ret = obj.mentionable ? obj.mention : obj.name;
         else if (obj instanceof Eris.Channel) ret = obj.mention;
         else if (obj instanceof Eris.Guild) ret = obj.name;
-        else throw new TypeError(`Unable to format object: ${obj && obj!.constructor ? obj!.constructor.name : obj}`);
+        else throw new TypeError(`Unable to format object: ${obj && obj!.constructor ? obj!.constructor.name : obj}`); // tslint:disable-line
 
         return ret;
     }
