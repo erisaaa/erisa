@@ -2,8 +2,9 @@
 
 import 'mocha';
 import Eris from 'eris';
-import {expect} from 'chai';
-import {Erisa, Formattable} from 'erisa_';
+import chai, {expect} from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import {Erisa, Formattable, AwaitTimeout} from 'erisa_';
 import {events, mixedHandlers, handlers, tests} from './consts';
 
 type VoidFunc = () => void;
@@ -14,6 +15,7 @@ function curry(func, ...args) {
     return () => func(...args);
 }
 
+chai.use(chaiAsPromised);
 beforeEach(() => {
     // Reset client for each test.
     client = new Erisa('nothing');
@@ -280,6 +282,60 @@ describe('erisa', () => {
                         expect(client.format(guild)).to.equal('foo');
                     });
                 });
+            });
+        });
+
+        describe('#awaitMessage', () => {
+            it('should return a message from the wanted user and channel', () => {
+                const ret = client.awaitMessage('1234567890', '1234567890');
+                const msg = {
+                    id: '1234567890',
+                    channel: {id: '1234567890'},
+                    author: {id: '1234567890'}
+                };
+
+                client.emit('messageCreate', msg);
+
+                return expect(ret).to.eventually.deep.equal(msg);
+            });
+
+            it('should obey the given filter', () => {
+                const ret = client.awaitMessage('1234567890', '1234567890', {filter: m => m.content === 'Foobar'});
+                const msg1 = {
+                    id: '1234567890',
+                    content: 'foobar',
+                    channel: {id: '1234567890'},
+                    author: {id: '1234567890'}
+                };
+                const msg2 = {
+                    id: '1234567890',
+                    content: 'Foobar',
+                    channel: {id: '1234567890'},
+                    author: {id: '1234567890'}
+                };
+
+                client.emit('messageCreate', msg1);
+                client.emit('messageCreate', msg2);
+
+                return Promise.all([
+                    expect(ret).to.eventually.not.become(msg1),
+                    expect(ret).to.eventually.become(msg2)
+                ]);
+            });
+
+            it('should obey the given timeout, and timeout', done => {
+                const ret = client.awaitMessage('1234567890', '1234567890', {timeout: 0});
+                const msg = {
+                    id: '1234567890',
+                    channel: {id: '1234567890'},
+                    author: {id: '1234567890'}
+                };
+
+                // Delay until next cycle.
+                setTimeout(() => {
+                    client.emit('messageCreate', msg);
+                    expect(ret).to.eventually.be.rejectedWith(AwaitTimeout, 'Message await expired.').and.notify(done);
+                }, 0);
             });
         });
     });
