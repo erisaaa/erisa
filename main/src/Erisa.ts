@@ -183,7 +183,7 @@ export class Erisa extends Eris.Client {
     handleEvent(ev: string): (...args: any[]) => Promise<void> {
         if (ev === '*') return async function(event, ...args) {
             const matchingEvents = Array.from(this.handlers.keys())
-                .filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)));
+                .filter(k => (k instanceof RegExp ? k.test(event) : minimatch(event, k as string)) && k !== event);
             const handlers = [].concat.apply([], Array.from(this.handlers.entries())
                 .filter(([k]) => matchingEvents.includes(k)).map(v => v[1]));
 
@@ -193,7 +193,7 @@ export class Erisa extends Eris.Client {
         return async function(...args) {
             if (!this.handlers.get(ev)) return;
 
-            for (const handler of this.handlers.get(ev)) await handler(ev, ...args);
+            for (const handler of this.handlers.get(ev)) await handler({event: ev, erisa: this}, ...args);
         }.bind(this);
     }
 
