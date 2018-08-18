@@ -235,7 +235,31 @@ export default class Holder {
         return filtered;
     }
 
-    [Symbol.iterator](): IterableIterator<[string, Command]> {
+    /**
+     * Returns a list of all categories that have at least one command under them.
+     */
+    get categories() {
+        return Array.from(this.commands.entries()).reduce((m, [_, c]) => c.category && !m.includes(c.category) ? m.concat(c.category) : m, [] as (string | null)[]);
+    }
+
+    /**
+     * Sorts commands into objects containing their matching category and other commands with the same category.
+     * Commands with no set category are listed under `category: null`.
+     * 
+     * @returns An array of objects matching commands to categories.
+     */
+    get commandsByCategory() {
+        return this.categories.concat(null).map(c => ({
+            category: c,
+            commands: Array.from(this.commands.entries()).filter(([_, v]) => c
+                ? v.category === c
+                : v.category == c // tslint:disable-line 
+                // This is for matching commands without a category, as undefined can coerce to null.
+            ).map(([_, v]) => v)
+        }));
+    }
+
+    [Symbol.iterator]() {
         return this.commands[Symbol.iterator]();
     }
 }
