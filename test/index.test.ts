@@ -114,6 +114,71 @@ describe('erisa', () => {
             });
         });
 
+        describe('#handleEvent', () => {
+            it('should return a function', () => {
+                expect(client.handleEvent('foo')).to.be.a('function');
+            });
+
+            describe('returned function', () => {
+                it('should fire the assigned event', done => {
+                    const func = client.handleEvent('foo');
+
+                    client.use('foo', () => done()); // tslint:disable-line no-unnecessary-callback-wrapper
+                    func();
+                });
+
+                it("shouldn't fire any other event other than the assigned event", done => {
+                    const func = client.handleEvent('foo');
+
+                    client.use('bar', () => done(new Error('This should never be reached.')));
+                    func();
+                    setTimeout(done, 0);
+                });
+
+                describe('star (wildcard)', () => {
+                    it('should run any event', done => {
+                        const func = client.handleEvent('*');
+                        let times = 0;
+                        function call() {
+                            times++;
+                            console.log(times);
+
+                            if (times === 3) done();
+                        }
+
+                        client.use('foo', call);
+                        client.use('bar', call);
+                        client.use('foobar', call);
+
+                        func('foo');
+                        func('bar');
+                        func('foobar');
+                    });
+
+                    it('should match wildcard and regex events', done => {
+                        const func = client.handleEvent('*');
+                        const badde = () => done(new Error('This should never be reached.'));
+                        let times = 0;
+                        function call() {
+                            times++;
+
+                            if (times === 3) done();
+                        }
+
+                        client.use('*', call);
+                        client.use(/foo/, call);
+                        client.use('f*', call);
+
+                        client.use('bar', badde);
+                        client.use(/bar/, badde);
+                        client.use('b*', badde);
+
+                        func('foo');
+                    });
+                });
+            });
+        });
+
         describe('#emit', () => {
             it('should emit a `*` event on any event, along with the original event', done => {
                 let counter = 0;
