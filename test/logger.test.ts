@@ -23,7 +23,7 @@ beforeEach(() => {
     loggerExt = client.extensions.logger;
 });
 
-describe('logger', () => {
+describe('@erisa/logger', () => {
     describe('printing the in-built levels', () => {
         for (const level of Object.keys(loggerExt.levels))
             specify(level, () => {
