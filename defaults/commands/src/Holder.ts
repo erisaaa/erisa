@@ -38,7 +38,7 @@ export default class Holder {
      * @param directory Directory to find commands in.
      * @param deep Whether to look in nested directories for more commands.
      */
-    async loadAll(directory: string, deep: boolean = false): Promise<void> {
+    async loadAll(dir: string, deep: boolean = false): Promise<void> {
         const files: string[] = await Promise.all(await (deep ? walk(dir) : fs.readdir(dir)))
             .filter(async f => (await fs.stat(f)).isDirectory()));
 
