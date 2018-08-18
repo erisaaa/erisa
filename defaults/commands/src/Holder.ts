@@ -155,6 +155,9 @@ export default class Holder {
                 if (cmd.subcommands.length && cmd.subcommands.find(sub => sub.name === arg))
                     cmd = cmd.subcommands.find(sub => sub.name === arg)!;
 
+        if (cmd.guildOnly && !ctx.guild)
+            return ctx.send('This command can only be run in a server.');
+
         if (cmd.ownerOnly && ctx.author.id === this.client.extras.owner)
             await cmd.main(ctx);
         else if (!cmd.ownerOnly) {
