@@ -53,6 +53,21 @@ describe('erisa', () => {
             });
         });
 
+        describe('#usePairs', () => {
+            it('should return `this`', () => {
+                expect(client.usePairs()).to.equal(client);
+            });
+
+            it('should register the provided pairs of events and middleware correctly', () => {
+                client.usePairs(['foo', handlers[0]]);
+                client.usePairs(['bar', handlers[0]], ['bar', handlers[1]], ['foobar', handlers[2]]);
+
+                expect(client.handlers.get('foo')).to.deep.equal([handlers[0]]);
+                expect(client.handlers.get('bar')).to.deep.equal([handlers[0], handlers[1]]);
+                expect(client.handlers.get('foobar')).to.deep.equal([handlers[2]]);
+            });
+        });
+
         describe('#disuse', () => {
             it('should return `this`', () => {
                 expect(client.disuse(() => {})).to.equal(client);
