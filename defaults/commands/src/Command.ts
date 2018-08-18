@@ -6,10 +6,12 @@ export default abstract class Command {
     name?: string;
     abstract overview: string;
     description?: string;
+    usage?: string;
     ownerOnly?: boolean;
     guildOnly?: boolean;
     hidden?: boolean;
     aliases?: string[];
+    category?: string;
     permissions?: ICommandPermissions;
     readonly subcommands: SubCommand[] = [];
 

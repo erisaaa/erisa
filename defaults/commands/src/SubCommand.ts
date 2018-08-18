@@ -6,6 +6,7 @@ interface ISubCommandOptions {
     name?: string;
     overview: string;
     description?: string;
+    usage?: string;
     ownerOnly?: boolean;
     guildOnly?: boolean;
     hidden?: boolean;
@@ -17,6 +18,7 @@ export default class SubCommand implements Command {
     name: string;
     overview: string;
     description?: string;
+    usage?: string;
     ownerOnly?: boolean;
     guildOnly?: boolean;
     hidden?: boolean;
@@ -29,6 +31,7 @@ export default class SubCommand implements Command {
         this.name = options.name || '';
         this.overview = options.overview;
         this.description = options.description;
+        this.usage = options.usage;
         this.ownerOnly = options.ownerOnly || false;
         this.guildOnly = options.guildOnly || false;
         this.hidden = options.hidden || false;
