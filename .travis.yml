@@ -13,7 +13,7 @@ before_script:
   - ./cc-test-reporter before-build
   - npx lerna bootstrap
 script:
-  - npm run lint
-  - npm run coverage
+  - yarn lint
+  - yarn coverage
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
