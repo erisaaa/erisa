@@ -1,9 +1,10 @@
 import {Constants} from 'eris';
-import {Erisa, MiddlewareHandler} from 'erisa';
+import {Erisa, Matchable, MiddlewareHandler} from 'erisa';
 import Context from './Context';
 import Holder from './Holder';
+import defaultHelp from './defaultHelp';
 
-export {default as SubCommand, decorator as DecoSubCommand} from './SubCommand';
+export {default as SubCommand, decorator as subcommand} from './SubCommand';
 export {default as Context, ContextDestinations, PermissionTargets} from './Context';
 export {default as Command} from './Command';
 export {default as Holder} from './Holder';
@@ -31,7 +32,7 @@ interface CommandHandlerOptions {
     defaultHelp?: boolean;
     contextClass?: Ctor<Context>;
     owner: string;
-    prefixes: string[];
+    prefixes: (string | RegExp)[];
 }
 
 const defaults = {
@@ -41,23 +42,43 @@ const defaults = {
     contextClass: Context
 };
 
-export default function setup(erisa: Erisa, options: CommandHandlerOptions): MiddlewareHandler {
-    const contextClass = options.contextClass || defaults.contextClass;
-    erisa.locals.commands = new Holder(erisa, options.prefixes);
+export default function setup(erisa: Erisa, options: CommandHandlerOptions): [Matchable, MiddlewareHandler][] {
+    const mergedOpts = {
+        commandDirectory: options.commandDirectory || defaults.commandDirectory,
+        autoLoad: options.autoLoad != null ? options.autoLoad : defaults.autoLoad,
+        defaultHelp: options.defaultHelp != null ? options.defaultHelp : defaults.defaultHelp,
+        contextClass: options.contextClass || defaults.contextClass,
+        owner: options.owner,
+        prefixes: options.prefixes
+    };
+    const holder = erisa.extensions.commands = new Holder(erisa, mergedOpts.prefixes, mergedOpts.owner);
 
     if (!erisa.eventNames().includes('rawWS')) erisa.on('rawWS', () => {}); // Needed so that Eris fires rawWS events at all.
+    if (mergedOpts.defaultHelp) holder.add(defaultHelp, 'help');
 
-    return function handler({erisa: client, event}, ...args) {
-        // if (event === 'rawWS') {
-        //     const [packet]: [RawPacket, any] = args;
+    return [
+        [
+            'rawWS',
+            async function handler({erisa: client, event}, packet: RawPacket) {
+                if (packet.op !== Constants.GatewayOPCodes.EVENT || packet.t !== 'MESSAGE_CREATE' ||
+                    !packet.d.content || !holder.testPrefix(packet.d.content)[0]) return;
 
-        //     if (packet.op !== Constants.GatewayOPCodes.EVENT || packet.t !== 'MESSAGE_CREATE') return;
+                const ctx = new mergedOpts.contextClass(packet.d, client);
 
-        //     const ctx = new contextClass(packet.d, client);
-        // }
-
-        if (event === 'ready' && erisa.locals.commands.loadCommands) {
-
-        }
-    };
+                try {
+                    await holder.run(ctx);
+                    client.emit('erisa.commands.run', ctx);
+                } catch (err) {
+                    await ctx.send(`There was an error when trying to run your command:\n${err}`);
+                }
+            }
+        ],
+        [
+            'ready',
+            async function handler({erisa: client}) {
+                await holder.loadAll(mergedOpts.commandDirectory, true);
+                client.emit('erisa.commands.loaded');
+            }
+        ]
+    ];
 }
