@@ -22,15 +22,32 @@ export default class Context extends Message {
         return this.channel.guild;
     }
 
-    async send(content: MessageContent, file?: MessageFile, destination: ContextDestinations = ContextDestinations.Channel): Promise<Message> {
-        if (destination === 'channel') return this.channel.createMessage(content, file);
-        else if (destination === 'author') return this.author.getDMChannel().then(dm => dm.createMessage(content, file));
-        else throw new Error(`Unknown destination: ${where}`);
+    async send(content: MessageContent, destination?: ContextDestinations): Promise<Message>;
+    async send(file: MessageFile, destination?: ContextDestinations): Promise<Message>;
+    async send(content: MessageContent, file: MessageFile, destination?: ContextDestinations): Promise<Message>;
+
+    async send(...args) {
+        const potentialDest = args[2] || args[1] ;
+        const dest: (content: MessageContent, file?: MessageFile) => Promise<Message> = typeof potentialDest === 'string' ? (
+            potentialDest === ContextDestinations.Author
+                ? await this.author.getDMChannel()
+                : this.channel
+        ) : this.channel;
+        let ret;
+
+        if (typeof args[0] === 'string' || args[0].content) // tslint:disable-line prefer-conditional-expression
+            ret = dest(args[0], typeof args[1] !== 'string' ? args[1] : null);
+        else if (args[0].file)
+            ret = dest(null, args[0]);
+        else
+            ret = dest(args[0], args[1]);
+
+        return ret;
     }
 
     hasPermission(permission: string, target: PermissionTargets = PermissionTargets.Self): boolean {
         if (!Object.keys(Constants.Permissions).includes(permission)) {
-            if (this.client.extensions.logger) this.client.extensions.logger.dispatch('warn', `Unknown permission "${permission}"`);
+            if (this._client.extensions.logger) this._client.extensions.logger.dispatch('warn', `Unknown permission "${permission}"`);
             return true;
         }
 
@@ -44,6 +61,10 @@ export default class Context extends Message {
             default:
                 throw new Error(`Unknown target: ${target}`);
         }
+    }
+
+    get isBotOwner() {
+        return this.author.id === this._client.extensions.holder.owner;
     }
 }
 
