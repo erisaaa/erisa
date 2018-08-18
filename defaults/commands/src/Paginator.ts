@@ -23,7 +23,7 @@ export default class Paginator {
         const pages: string[] = [];
         let thisPage = this.prefix;
 
-        for (const line of this.lines) {
+        for (const line of this.lines)
             if (thisPage.length === this.maxLength) {
                 pages.push(thisPage + this.suffix);
                 thisPage = this.prefix;
@@ -36,7 +36,6 @@ export default class Paginator {
                 pages.push(split.join('\n') + this.suffix);
                 thisPage = this.prefix + last.join('\n');
             } else thisPage += `${line}\n`;
-        }
 
         if (thisPage) pages.push(thisPage + this.suffix);
 

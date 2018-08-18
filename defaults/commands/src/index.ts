@@ -2,7 +2,7 @@ import {Constants} from 'eris';
 import {Erisa, Matchable, MiddlewareHandler} from 'erisa';
 import Context from './Context';
 import Holder from './Holder';
-import defaultHelp from './defaultHelp';
+import {default as defaultHelp} from './defaultHelp';
 
 export {default as SubCommand, decorator as subcommand} from './SubCommand';
 export {default as Context, ContextDestinations, PermissionTargets} from './Context';
@@ -45,8 +45,8 @@ const defaults = {
 export default function setup(erisa: Erisa, options: CommandHandlerOptions): [Matchable, MiddlewareHandler][] {
     const mergedOpts = {
         commandDirectory: options.commandDirectory || defaults.commandDirectory,
-        autoLoad: options.autoLoad != null ? options.autoLoad : defaults.autoLoad,
-        defaultHelp: options.defaultHelp != null ? options.defaultHelp : defaults.defaultHelp,
+        autoLoad: options.autoLoad !== undefined ? options.autoLoad : defaults.autoLoad,
+        defaultHelp: options.defaultHelp !== undefined ? options.defaultHelp : defaults.defaultHelp,
         contextClass: options.contextClass || defaults.contextClass,
         owner: options.owner,
         prefixes: options.prefixes
