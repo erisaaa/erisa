@@ -16,8 +16,8 @@ export interface ErisaOptions {
 }
 
 export interface AwaitMessageOptions {
-    timeout: number;
-    filter(msg: Eris.Message): boolean;
+    timeout?: number;
+    filter?(msg: Eris.Message): boolean;
 }
 
 /**
