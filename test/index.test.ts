@@ -15,38 +15,48 @@ beforeEach(() => {
 });
 
 describe('Middleware handling', () => {
-    describe('registering under one event', () => {
-        for (const [name, tester] of Object.entries(tests))
-            specify(name, () => {
-                if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use('foo', ...tester as (VoidFunc | VoidFunc[])[]);
-                else client.use('foo', tester as VoidFunc | (VoidFunc)[]);
+    describe('#use', () => {
+        it('should return `this`', () => {
+            expect(client.use()).to.equal(client);
+        });
 
-                // Everything other than the first test should be equal to `handlers`.
-                expect(client.handlers.get('foo')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
-            });
-    });
+        describe('registering under one event', () => {
+            for (const [name, tester] of Object.entries(tests))
+                specify(name, () => {
+                    if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use('foo', ...tester as (VoidFunc | VoidFunc[])[]);
+                    else client.use('foo', tester as VoidFunc | (VoidFunc)[]);
 
-    describe('registering under an event array', () => {
-        for (const [name, tester] of Object.entries(tests))
-            specify(name, () => {
-                if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(events, ...tester as (VoidFunc | VoidFunc[])[]);
-                else client.use(events, tester as VoidFunc | (VoidFunc)[]);
+                    // Everything other than the first test should be equal to `handlers`.
+                    expect(client.handlers.get('foo')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
+                });
+        });
 
-                for (const ev of events) expect(client.handlers.get(ev)).to.deep.equal(name === 'single handler' ? [tester] : handlers);
-            });
-    });
+        describe('registering under an event array', () => {
+            for (const [name, tester] of Object.entries(tests))
+                specify(name, () => {
+                    if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(events, ...tester as (VoidFunc | VoidFunc[])[]);
+                    else client.use(events, tester as VoidFunc | (VoidFunc)[]);
 
-    describe('implicitly registering under the `*` event', () => {
-        for (const [name, tester] of Object.entries(tests))
-            specify(name, () => {
-                if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(...tester as (VoidFunc | VoidFunc[])[]);
-                else client.use(tester as VoidFunc | VoidFunc[]);
+                    for (const ev of events) expect(client.handlers.get(ev)).to.deep.equal(name === 'single handler' ? [tester] : handlers);
+                });
+        });
 
-                expect(client.handlers.get('*')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
-            });
+        describe('implicitly registering under the `*` event', () => {
+            for (const [name, tester] of Object.entries(tests))
+                specify(name, () => {
+                    if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(...tester as (VoidFunc | VoidFunc[])[]);
+                    else client.use(tester as VoidFunc | VoidFunc[]);
+
+                    expect(client.handlers.get('*')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
+                });
+        });
     });
 
     describe('#disuse', () => {
+        it('should return `this`', () => {
+            expect(client.disuse(() => {})).to.equal(client);
+        });
+
         describe('removing from explicitly defined events', () => {
             for (const [name, tester] of Object.entries(tests))
                 specify(name, () => {
