@@ -62,7 +62,22 @@ export default class Holder {
 
         if (!Array.isArray(module)) module = [module];
 
-        for (const command of module) {
+        for (const command of module) await this.add(command, mod);
+
+        if (!this.modules.get(mod)) {
+            this.modules.delete(mod);
+            delete require.cache[require.resolve(mod)];
+        }
+    }
+
+    /**
+     * Adds a given command to the command holder, properly assigning name, aliases, etc.
+     * 
+     * @param command Command constructor to add.
+     * @param mod Module name to register the command under.
+     * @returns The constructed command, in case it's needed.
+     */
+    async add(command: Ctor<Command>, mod: string): Promise<Command> {
             const cmd = new command(this.client);
 
             if (cmd.init) await cmd.init();
@@ -92,13 +107,9 @@ export default class Holder {
                 this.aliases.set(alias, this.commands.get(cmd.name)!);
                 this.modules.set(mod, this.modules.get(mod)!.concat(alias));
             }
-        }
 
-        if (!this.modules.get(mod)) {
-            this.modules.delete(mod);
-            delete require.cache[require.resolve(mod)];
+        return cmd;
         }
-    }
 
     /**
      * Removes all loaded commands from a given module.
