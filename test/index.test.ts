@@ -138,25 +138,6 @@ describe('erisa', () => {
                 });
 
                 describe('star (wildcard)', () => {
-                    it('should run any event', done => {
-                        const func = client.handleEvent('*');
-                        let times = 0;
-                        function call() {
-                            times++;
-                            console.log(times);
-
-                            if (times === 3) done();
-                        }
-
-                        client.use('foo', call);
-                        client.use('bar', call);
-                        client.use('foobar', call);
-
-                        func('foo');
-                        func('bar');
-                        func('foobar');
-                    });
-
                     it('should match wildcard and regex events', done => {
                         const func = client.handleEvent('*');
                         const badde = () => done(new Error('This should never be reached.'));
@@ -318,12 +299,13 @@ describe('erisa', () => {
                 client.emit('messageCreate', msg2);
 
                 return Promise.all([
+                    expect(ret).to.eventually.not.be.rejected,
                     expect(ret).to.eventually.not.become(msg1),
                     expect(ret).to.eventually.become(msg2)
                 ]);
             });
 
-            it('should obey the given timeout, and timeout', done => {
+            it('should obey the given timeout, and timeout', () => {
                 const ret = client.awaitMessage('1234567890', '1234567890', {timeout: 0});
                 const msg = {
                     id: '1234567890',
@@ -334,8 +316,9 @@ describe('erisa', () => {
                 // Delay until next cycle.
                 setTimeout(() => {
                     client.emit('messageCreate', msg);
-                    expect(ret).to.eventually.be.rejectedWith(AwaitTimeout, 'Message await expired.').and.notify(done);
                 }, 0);
+
+                return expect(ret).to.eventually.be.rejectedWith(AwaitTimeout, 'Message await expired.');
             });
         });
     });
