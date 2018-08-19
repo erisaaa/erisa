@@ -31,19 +31,19 @@ export default class Context extends Eris.Message {
 
     async send(...args) {
         const potentialDest = args[2] || args[1] ;
-        const dest: (content: Eris.MessageContent, file?: Eris.MessageFile) => Promise<Eris.Message> = typeof potentialDest === 'string' ? (
+        const dest: Eris.Textable = typeof potentialDest === 'string' ? (
             potentialDest === ContextDestinations.Author
-                ? (await this.author.getDMChannel()).createMessage
-                : this.channel.createMessage
-        ) : this.channel.createMessage;
+                ? await this.author.getDMChannel()
+                : this.channel
+        ) : this.channel;
         let ret;
 
         if (typeof args[0] === 'string' || args[0].content) // tslint:disable-line prefer-conditional-expression
-            ret = dest(args[0], typeof args[1] !== 'string' ? args[1] : null);
+            ret = dest.createMessage(args[0], typeof args[1] !== 'string' ? args[1] : null);
         else if (args[0].file)
-            ret = dest('', args[0]);
+            ret = dest.createMessage('', args[0]);
         else
-            ret = dest(args[0], args[1]);
+            ret = dest.createMessage(args[0], args[1]);
 
         return ret;
     }
