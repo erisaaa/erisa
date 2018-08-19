@@ -17,5 +17,5 @@ export default abstract class Command {
 
     // constructor(readonly client: Erisa) {}
     async init?(): Promise<void>;
-    abstract async main(ctx: Context): Promise<void>;
+    abstract async main(ctx: Context): Promise<any>;
 }

@@ -30,7 +30,7 @@ export default class Help extends Command {
             }
 
             try {
-                for (const page of paginator.pages) await ctx.send(page, null, CD.Author);
+                for (const page of paginator.pages) await ctx.send(page, CD.Author);
             } catch {
                 await ctx.send('I am unable to send you DMs. Perhaps you have me blocked or have DMs disabled?');
             }

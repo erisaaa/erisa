@@ -39,8 +39,8 @@ export default class Holder {
      * @param deep Whether to look in nested directories for more commands.
      */
     async loadAll(dir: string, deep: boolean = false): Promise<void> {
-        const files: string[] = await Promise.all(await (deep ? walk(dir) : fs.readdir(dir)))
-            .filter(async f => (await fs.stat(f)).isDirectory()));
+        const files: string[] = (await Promise.all(await (deep ? walk(dir) : fs.readdir(dir))))
+            .filter(async f => (await fs.stat(f)).isDirectory());
 
         for (const f of files)
             try {
@@ -72,12 +72,12 @@ export default class Holder {
 
     /**
      * Adds a given command to the command holder, properly assigning name, aliases, etc.
-     * 
+     *
      * @param command Command constructor to add.
      * @param mod Module name to register the command under.
      * @returns The constructed command, in case it's needed.
      */
-    async add(command: Ctor<Command>, mod: string): Promise<Command> {
+    async add<T extends Command>(command: Ctor<T>, mod: string): Promise<Command> {
         const cmd = new command(this.client);
 
         if (cmd.init) await cmd.init();
@@ -156,9 +156,9 @@ export default class Holder {
                     cmd = cmd.subcommands.find(sub => sub.name === arg)!;
 
         if (cmd.guildOnly && !ctx.guild)
-            return ctx.send('This command can only be run in a server.');
+            return void ctx.send('This command can only be run in a server.');
 
-        if (cmd.ownerOnly && ctx.author.id === this.client.extras.owner)
+        if (cmd.ownerOnly && ctx.isBotOwner)
             await cmd.main(ctx);
         else if (!cmd.ownerOnly) {
             const perms = this.handlePermissions(cmd, ctx);
@@ -206,7 +206,7 @@ export default class Holder {
         }
 
         const zip = rows => rows[0].map((_, c) => rows.map(row => row[c]));
-        const zipped = [0, 1, 2].map(v => zip([Object.values(cmd.permissions)[v], Object.values(permChecks)[v]]));
+        const zipped = [0, 1, 2].map(v => zip([Object.values(cmd.permissions!)[v], Object.values(permChecks)[v]]));
         const allEqual = zipped.reduce((m, v) => m && v.reduce((n, [x, y]) => n && x === y)); // Determines whether all the requested permissions are met.
 
         if (allEqual) return [true];
@@ -236,7 +236,7 @@ export default class Holder {
 
     /**
      * Gets a mod either by an alias or normal name.
-     * 
+     *
      * @param cmd Command to try and get.
      * @returns The matching command if it exists.
      */
@@ -266,7 +266,7 @@ export default class Holder {
     /**
      * Sorts commands into objects containing their matching category and other commands with the same category.
      * Commands with no set category are listed under `category: null`.
-     * 
+     *
      * @returns An array of objects matching commands to categories.
      */
     get commandsByCategory() {
@@ -274,7 +274,7 @@ export default class Holder {
             category: c,
             commands: Array.from(this.commands.entries()).filter(([_, v]) => c
                 ? v.category === c
-                : v.category == c // tslint:disable-line 
+                : v.category == c // tslint:disable-line
                 // This is for matching commands without a category, as undefined can coerce to null.
             ).map(([_, v]) => v)
         }));
