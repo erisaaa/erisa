@@ -9,7 +9,8 @@
   "scripts": {
     "test": "mocha",
     "coverage": "nyc mocha",
-    "lint": "lerna run lint"
+    "lint": "lerna run lint",
+    "build": "lerna run build"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
