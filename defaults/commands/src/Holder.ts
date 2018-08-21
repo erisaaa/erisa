@@ -167,7 +167,7 @@ export default class Holder {
             else {
                 const [, field, permission] = perms as [false, PermissionTargets, string];
                 const permString = PermissionStrings[permission];
-                const msg = (field === PermissionTargets.Self || !ctx.hasPermission(permission))
+                const msg = (field === 'self' || !ctx.hasPermission(permission))
                     ? `I am missing the **${permString}** permission.`
                     : `You are missing the **${permString}** Permission.`;
 
@@ -183,7 +183,7 @@ export default class Holder {
      * @param ctx Context to compare with the command.
      * @returns First item is a boolean for whether or not all the checks are met. If false, the second item is the missing scope, and the third item is the missing permission.
      */
-    handlePermissions(cmd: Command, ctx: Context): [true] | [false, string, string] {
+    handlePermissions(cmd: Command, ctx: Context): [true] | [false, PermissionTargets, string] {
         if (!cmd.permissions) return [true];
 
         const permChecks = {
@@ -194,10 +194,10 @@ export default class Holder {
 
         for (const type of ['both', 'author', 'self']) {
             const target = type === 'both'
-                ? PermissionTargets.Both
+                ? 'both'
                 : type === 'author'
-                    ? PermissionTargets.Author
-                    : PermissionTargets.Self;
+                    ? 'author'
+                    : 'self';
 
             if (Array.isArray(cmd.permissions[type]))
                 permChecks[type] = cmd.permissions[type].filter(perm => ctx.hasPermission(perm, target));

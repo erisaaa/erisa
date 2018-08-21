@@ -32,7 +32,7 @@ export default class Context extends Eris.Message {
     async send(...args) {
         const potentialDest = args[2] || args[1] ;
         const dest: Eris.Textable = typeof potentialDest === 'string' ? (
-            potentialDest === ContextDestinations.Author
+            potentialDest === 'author'
                 ? await this.author.getDMChannel()
                 : this.channel
         ) : this.channel;
@@ -48,7 +48,7 @@ export default class Context extends Eris.Message {
         return ret;
     }
 
-    hasPermission(permission: string, target: PermissionTargets = PermissionTargets.Self): boolean {
+    hasPermission(permission: string, target: PermissionTargets = 'author'): boolean {
         if (!Object.keys(Eris.Constants.Permissions).includes(permission)) {
             if (this._client.extensions.logger) this._client.extensions.logger.dispatch('warn', `Unknown permission "${permission}"`);
             return true;
@@ -56,12 +56,12 @@ export default class Context extends Eris.Message {
         if (!(this.channel instanceof Eris.GuildChannel)) return true;
 
         switch (target) {
-            case PermissionTargets.Self:
+            case 'self':
                 return this.channel.permissionsOf(this._client.user.id).has(permission);
-            case PermissionTargets.Author:
+            case 'author':
                 return this.channel.permissionsOf(this.author.id).has(permission);
-            case PermissionTargets.Both:
-                return this.hasPermission(permission) && this.hasPermission(permission, PermissionTargets.Author);
+            case 'both':
+                return this.hasPermission(permission) && this.hasPermission(permission, 'author');
             default:
                 throw new Error(`Unknown target: ${target}`);
         }
@@ -72,13 +72,5 @@ export default class Context extends Eris.Message {
     }
 }
 
-export enum ContextDestinations {
-    Channel = 'channel',
-    Author = 'author'
-}
-
-export enum PermissionTargets {
-    Self = 'self',
-    Author = 'author',
-    Both = 'both'
-}
+export type ContextDestinations = 'channel' | 'author';
+export type PermissionTargets = 'self' | 'author' | 'both';
