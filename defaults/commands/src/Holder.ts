@@ -205,17 +205,49 @@ export default class Holder {
                 permChecks[type].push(cmd.permissions[type]);
         }
 
+        interface PermTuples {
+            both: [any, any];
+            author: [any, any];
+            self: [any, any];
+        }
+
         const zip = rows => rows[0].map((_, c) => rows.map(row => row[c]));
-        const zipped = [0, 1, 2].map(v => zip([Object.values(cmd.permissions!)[v], Object.values(permChecks)[v]]));
-        const allEqual = zipped.reduce((m, v) => m && v.reduce((n, [x, y]) => n && x === y)); // Determines whether all the requested permissions are met.
+
+        const zippedPerms: PermTuples = ['both', 'author', 'self'].map(k =>
+            [cmd.permissions![k] || null, permChecks[k] || null, k]
+        ).reduce((m, [x, y, k]) => {
+            m[k] = [Array.isArray(x) ? x : [x], y];
+            return m;
+        }, {} as PermTuples);
+        const allEqual = Object.entries(zippedPerms).reduce((m, [, [cPerm, uPerm]]) => {
+            if (!cPerm) return m;
+            else if (!uPerm || cPerm.length !== uPerm.length) return false;
+
+            for (const [c, u] of zip([cPerm.sort(), uPerm.sort()]))
+                if (c !== u) return false;
+
+            // If `m` was false before, this will continue to be false all the way through.
+            return m && true;
+        }, true);
 
         if (allEqual) return [true];
         else {
-            const unequalScope = zipped.find(v => v.find(([x, y]) => x !== y)); // Finds the first scope that has an unmet permission.
-            const missingPermission = unequalScope.find(([x, y]) => x !== y); // Get the permission that is missing.
-            const missingScope = Object.keys(cmd.permissions)[zipped.indexOf(unequalScope)]; // Find the scope that has the missing permission.
+            const missingScope: PermissionTargets = Object.entries(zippedPerms).find(([, [cPerm, uPerm]]) => {
+                for (const [c, u] of zip([cPerm.sort(), uPerm.sort()]))
+                    if (c !== u) return true;
 
-            return [false, missingScope, missingPermission];
+                return false;
+            })![0] as any;
+
+            const missingPerm: string = zippedPerms[missingScope].find(([cPerm, uPerm]) => {
+                for (const [c, u] of zip([cPerm.sort(), uPerm.sort()]))
+                    if (c !== u) return true;
+
+                // This should never be reached
+                throw new Error('Unable to find missingPerm in missingScope.');
+            });
+
+            return [false, missingScope, missingPerm];
         }
     }
 
