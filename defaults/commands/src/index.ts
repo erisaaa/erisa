@@ -8,15 +8,15 @@ export {default as SubCommand, decorator as subcommand} from './SubCommand';
 export {default as Context, ContextDestinations, PermissionTargets} from './Context';
 export {default as Command} from './Command';
 export {default as Holder} from './Holder';
+export {default as parseArgs} from './parseArgs';
+export {default as Paginator} from './Paginator';
+export {default as Constants} from './Constants';
+export const DefaultHelp = defaultHelp; // tslint:disable-line variable-name
 
 export interface ICommandPermissions {
     self: string | string[];
     author: string | string[];
     both: string | string[];
-}
-
-interface Ctor<T> {
-    new(...args: any[]): T;
 }
 
 interface RawPacket {
@@ -26,16 +26,21 @@ interface RawPacket {
     s?: number;
 }
 
-interface CommandHandlerOptions {
+interface CommandHandlerOptionsOptionals {
     commandDirectory?: string;
     autoLoad?: boolean;
     defaultHelp?: boolean;
-    contextClass?: Ctor<Context>;
+    contextClass?: typeof Context;
+}
+
+interface CommandHandlerOptionsRequired {
     owner: string;
     prefixes: (string | RegExp)[];
 }
 
-const defaults = {
+type CommandHandlerOptions = CommandHandlerOptionsOptionals & CommandHandlerOptionsRequired;
+
+const defaults: CommandHandlerOptionsOptionals = {
     commandDirectory: './commands',
     autoLoad: true,
     defaultHelp: true,
@@ -44,10 +49,10 @@ const defaults = {
 
 export default function setup(erisa: Erisa, options: CommandHandlerOptions): [Matchable, MiddlewareHandler][] {
     const mergedOpts = {
-        commandDirectory: options.commandDirectory || defaults.commandDirectory,
-        autoLoad: options.autoLoad !== undefined ? options.autoLoad : defaults.autoLoad,
-        defaultHelp: options.defaultHelp !== undefined ? options.defaultHelp : defaults.defaultHelp,
-        contextClass: options.contextClass || defaults.contextClass,
+        commandDirectory: (options.commandDirectory || defaults.commandDirectory)!,
+        autoLoad: (options.autoLoad !== undefined ? options.autoLoad : defaults.autoLoad)!,
+        defaultHelp: (options.defaultHelp !== undefined ? options.defaultHelp : defaults.defaultHelp)!,
+        contextClass: (options.contextClass || defaults.contextClass)!,
         owner: options.owner,
         prefixes: options.prefixes
     };
