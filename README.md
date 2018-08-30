@@ -21,7 +21,7 @@ I recommened installing [yarn](https://yarnpkg.com) if you haven't already, as t
 0. Clone this repository to somewhere on your computer.
 1. Install the main packages. Make sure that you're installing the development dependencies (NODE_ENV != production, or the install command is run with `--dev`), otherwise basically nothing will happen.
 ```
-$ yarn (install isn't needed)
+$ yarn
  or
 $ npm install
 ```
