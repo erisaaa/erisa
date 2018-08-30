@@ -63,9 +63,20 @@ export class Erisa extends Eris.Client {
      * Like `Erisa#use` but takes in pairs of [event, handler] to allow middleware to easily assign themselves to multiple events at once without using the wildcard event.
      * Equivalent to iterating through an array of event, handler pairs.
      *
-     * @param pairs Array of pairs to use.
+     * @param pairs Pairs to use.
      */
     usePairs(...pairs: [Matchable | Matchable[], (MiddlewareHandler | MiddlewareHandler[] | void)][]): this {
+        for (const [event, handlers] of pairs) this.use(event, handlers);
+
+        return this;
+    }
+
+    /**
+     * Erisa#usePairs except it takes in a single array instead of variadic arguments.
+     *
+     * @param pairs Array of pairs to use.
+     */
+    usePairsArray(pairs: [Matchable | Matchable[], (MiddlewareHandler | MiddlewareHandler[] | void)][]): this {
         for (const [event, handlers] of pairs) this.use(event, handlers);
 
         return this;
