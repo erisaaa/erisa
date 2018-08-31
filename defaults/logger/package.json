@@ -24,5 +24,8 @@
     },
     "dependencies": {
         "turbocolor": "^2.4.1"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
