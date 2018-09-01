@@ -10,7 +10,8 @@ interface ParsedArguments {
 export default function parseArgs(text: string): ParsedArguments {
     const [cmd, ...tmp] = text.split(' ');
     const suffix = tmp.join(' ').trim();
-    const args = suffix.match(QUOTE_REGEX)!.map(v => IS_QUOTED.test(v) ? v.slice(1, -1) : v).filter(v => v.trim());
+    let args = suffix.match(QUOTE_REGEX);
+    args = args ? args.map(v => IS_QUOTED.test(v) ? v.slice(1, -1) : v).filter(v => v.trim()) : [];
 
     return {
         args,

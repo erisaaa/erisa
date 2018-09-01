@@ -1,6 +1,6 @@
 {
   "name": "@erisa/commands",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "The default commands framework for Erisa.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

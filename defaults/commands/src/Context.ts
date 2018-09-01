@@ -13,7 +13,8 @@ export default class Context extends Eris.Message {
     constructor(data, client) {
         super(data, client);
 
-        const {args, cmd, suffix} = parseArgs(this.content);
+        const parsed: [true, string] = client.extensions.commands.testPrefix(this.content);
+        const {args, cmd, suffix} = parseArgs(parsed[1]);
         this.args = args;
         this.cmd = cmd;
         this.suffix = suffix;

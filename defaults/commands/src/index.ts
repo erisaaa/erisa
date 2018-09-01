@@ -58,7 +58,7 @@ export default function setup(erisa: Erisa, options: CommandHandlerOptions): [Ma
     };
     const holder = erisa.extensions.commands = new Holder(erisa, mergedOpts.prefixes, mergedOpts.owner);
 
-    if (!erisa.eventNames().includes('rawWS')) erisa.on('rawWS', () => {}); // Needed so that Eris fires rawWS events at all.
+    if (!erisa.eventNames().includes('rawWS')) erisa.on('rawWS', erisa.handleEvent('rawWS')); // Needed so that Eris fires rawWS events at all.
     if (mergedOpts.defaultHelp) holder.add<defaultHelp>(defaultHelp, 'help');
 
     return [
