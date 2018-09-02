@@ -18,12 +18,12 @@
     "eris": "^0.8.6"
   },
   "peerDependencies": {
-    "erisa": "^0.0.2"
+    "erisa": "^0.0.3"
   },
   "devDependencies": {
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.0.1"
   },
   "publishConfig": {
     "access": "public"
