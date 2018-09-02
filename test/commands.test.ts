@@ -142,7 +142,7 @@ describe('@erisa/commands', () => {
             normalAttach(client);
 
             expect(client.eventNames()).to.includes('rawWS');
-            expect(client.listeners('rawWS')[0].toString()).to.equal('() => { }');
+            expect(client.listeners('rawWS')[0].toString()).to.equal(client.handleEvent('rawWS').toString());
         });
     });
 
