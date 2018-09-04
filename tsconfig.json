@@ -6,10 +6,11 @@
         "allowSyntheticDefaultImports": true,
         "strictNullChecks": true,
         "esModuleInterop": true,
-        "baseUrl": ".",
-        "paths": {
-            "erisa_": ["main/"],
-            "@erisa_/*": ["defaults/*"]
-        }
-    }
+        "outDir": "dist/",
+        "declaration": true
+    },
+    "files": [
+        "src",
+        "index.ts"
+    ]
 }

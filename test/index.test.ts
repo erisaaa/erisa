@@ -4,7 +4,7 @@ import 'mocha';
 import Eris from 'eris';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {Erisa, Formattable, AwaitTimeout} from 'erisa_';
+import {Erisa, Formattable, AwaitTimeout} from '../';
 import {events, mixedHandlers, handlers, tests} from './consts';
 
 type VoidFunc = () => void;

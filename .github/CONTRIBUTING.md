@@ -1,13 +1,4 @@
 # Contribution Guide
-
-## Directory
-The current structure for this repository at the time of writing is as follows:
-
-- `.github/`: contains various "meta" files for use on GitHub, such as pull request and issue templates, as well as this document.
-- `defaults/`: contains packages that distributed under the `@erisa` scope on NPM. These are packages that are considered to be related to Erisa in some way, but aren't integral to it working.
-- `main/`: contains the code for the main `erisa` package.
-- `tests/`: contains the various tests for both the main Erisa code, as well as the "default" packages.
-
 ## Issues
 ### Bug Reports
 If you're reporting a bug with the library, first make sure to search for existing issues to make sure that it hasn't been reported before.

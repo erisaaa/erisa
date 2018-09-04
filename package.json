@@ -1,41 +1,50 @@
 {
-  "name": "erisa-monorepo",
-  "version": "4.2.0",
+  "name": "erisa",
+  "version": "0.0.3",
   "description": "A modular, unopinionated, middleware-based Discord bot framework.",
-  "repository": "https://github.com/Ovyerus/erisa",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/erisaaa/erisa",
   "author": "Ovyerus <iamovyerus@gmail.com>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "test": "mocha",
     "coverage": "nyc mocha",
-    "lint": "wsrun lint",
-    "build": "wsrun build --stages",
-    "clean": "wsrun clean",
-    "wsrun": "wsrun",
-    "install:all": "wsrun install --serial"
+    "lint": "tslint -p . -c tslint.json",
+    "compile": "tsc -p .",
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run compile",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "eris": "^0.9.0",
+    "minimatch": "^3.0.4"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
     "@types/chai-as-promised": "^7.1.0",
-    "@types/mocha": "^5.2.4",
+    "@types/minimatch": "^3.0.3",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.2",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "mocha": "^5.2.0",
     "nyc": "^13.0.1",
-    "source-map-support": "^0.5.8",
-    "test-console": "^1.1.0",
-    "ts-node": "^7.0.0",
-    "tsconfig-paths": "^3.5.0",
-    "tslint": "^5.10.0",
-    "turbocolor": "^2.4.3",
-    "typescript": "^3.0.1",
-    "wsrun": "^2.2.1"
+    "rimraf": "^2.6.2",
+    "source-map-support": "^0.5.9",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
   },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
   "nyc": {
     "include": [
-      "main/**/*.ts",
-      "defaults/**/*.ts"
+      "index.ts",
+      "src/**/*.ts"
     ],
     "exclude": [
       "test/**/*.test.ts"
@@ -53,9 +62,5 @@
     ],
     "sourceMap": true,
     "instrument": true
-  },
-  "workspaces": [
-    "defaults/*",
-    "main/"
-  ]
+  }
 }
