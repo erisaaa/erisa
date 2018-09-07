@@ -1,7 +1,7 @@
 # Erisa
 [![Build Status](https://travis-ci.org/erisaaa/erisa.svg?branch=master)](https://travis-ci.org/erisaaa/erisa)
-[![Maintainability](https://api.codeclimate.com/v1/badges/2edb44b50b742786f6f0/maintainability)](https://codeclimate.com/github/erisaaa/erisa/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/2edb44b50b742786f6f0/test_coverage)](https://codeclimate.com/github/erisaaa/erisa/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fd31f3df82c2b19d9413/maintainability)](https://codeclimate.com/github/erisaaa/erisa/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/fd31f3df82c2b19d9413/test_coverage)](https://codeclimate.com/github/erisaaa/erisa/test_coverage)
 
 Erisa is a Discord bot framework built upon [Eris](https://github.com/abalabahaha/eris) using TypeScript.
 
