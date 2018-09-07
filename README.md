@@ -49,7 +49,7 @@ bot.connect();
 ```
 
 ## I found a bug or want to request a feature
-Open an issue [here](https://github.com/Ovyerus/erisa/issues), making sure that no duplicate issues exist already (unless you believe your situation to be different enough to warrant a new issue).
+Open an issue [here](https://github.com/erisaaa/erisa/issues), making sure that no duplicate issues exist already (unless you believe your situation to be different enough to warrant a new issue).
 
 ## Contributing
 For further contribution, guidelines see [CONTRIBUTING](.github/CONTRIBUTING.md).
