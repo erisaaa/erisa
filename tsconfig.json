@@ -9,8 +9,8 @@
         "outDir": "dist/",
         "declaration": true
     },
-    "files": [
-        "src",
+    "include": [
+        "src/",
         "index.ts"
     ]
 }
