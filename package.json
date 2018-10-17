@@ -1,6 +1,6 @@
 {
   "name": "erisa",
-  "version": "0.0.3",
+  "version": "0.0.3-0",
   "description": "A modular, unopinionated, middleware-based Discord bot framework.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
