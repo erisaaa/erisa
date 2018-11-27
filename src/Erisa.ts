@@ -51,7 +51,7 @@ export class Erisa extends Eris.Client {
      * @param pairs Array of pairs of middleware functions and events, or just functions.
      * @returns The current client instance.
      */
-    use(pairs: Array<[MiddlewareEvent, MiddlewareFunction] | [MiddlewareFunction]>): this;
+    use(pairs: Array<[MiddlewareEvent, MiddlewareFunction] | [MiddlewareFunction]> | void): this;
 
     use(...args) {
         const flattenedArgs = [].concat.apply([], args).filter(v => v);
