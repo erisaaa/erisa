@@ -1,7 +1,14 @@
 import Eris from 'eris';
 import {default as minimatch} from 'minimatch';
 import awaitMessageHandler from './awaitMessageHandler';
-import {AwaitingObject, AwaitMessageOptions, AwaitTimeout, DeferredPromise, ErisaOptions, Formattable, Matchable, MiddlewareHandler} from './types';
+import {
+    AwaitingObject, AwaitMessageOptions, AwaitTimeout, DeferredPromise,
+    ErisaOptions,
+    Formattable, Matchable, MiddlewareHandler
+} from './types';
+
+type MiddlewareEvent = Matchable | Matchable[];
+type MiddlewareFunction = MiddlewareHandler | MiddlewareHandler[] | void;
 
 /**
  * The main Erisa client.
@@ -27,7 +34,7 @@ export class Erisa extends Eris.Client {
      * @param handlers An array of functions to run on any event.
      * @returns The current client instance.
      */
-    use(...handlers: (MiddlewareHandler | MiddlewareHandler[] | void)[]): this;
+    use(...handlers: MiddlewareFunction[]): this;
 
     /**
      * Registers middleware for specific events to the client.
@@ -36,7 +43,15 @@ export class Erisa extends Eris.Client {
      * @param handlers An array of functions to run for the provided events.
      * @returns The current client instance.
      */
-    use(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[] | void)[]): this;
+    use(events: MiddlewareEvent, ...handlers: MiddlewareFunction[]): this;
+
+    /**
+     * Registers pairs of middleware functions and event names. Intended for modules to utilise.
+     *
+     * @param pairs Array of pairs of middleware functions and events, or just functions.
+     * @returns The current client instance.
+     */
+    use(pairs: Array<[MiddlewareEvent, MiddlewareFunction] | [MiddlewareFunction]>): this;
 
     use(...args) {
         const flattenedArgs = [].concat.apply([], args).filter(v => v);
@@ -47,7 +62,12 @@ export class Erisa extends Eris.Client {
             if (typeof ev === 'string' && !this.eventNames().includes(ev)) this.on(ev, this.handleEvent(ev));
         };
 
-        if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true)) setHandlers('*', flattenedArgs);
+        // Handle multi-registration (passing an array of pairs to #use).
+        if (args.length === 1 && Array.isArray(args[0]) && Array.isArray(args[0][0]))
+            for (const pair of args[0] as Array<[MiddlewareFunction] | [MiddlewareEvent, MiddlewareFunction]>) this.use(...pair as any);
+        // Handle only functions passed (register to *).
+        else if (typeof args[0] === 'function' || flattenedArgs.reduce((m, v) => m && typeof v === 'function', true))
+            setHandlers('*', flattenedArgs);
         else {
             let [events, ...handlers] = args;
             handlers = [].concat.apply([], handlers).filter(v => v); // Clean out void functions.
@@ -60,36 +80,13 @@ export class Erisa extends Eris.Client {
     }
 
     /**
-     * Like `Erisa#use` but takes in pairs of [event, handler] to allow middleware to easily assign themselves to multiple events at once without using the wildcard event.
-     * Equivalent to iterating through an array of event, handler pairs.
-     *
-     * @param pairs Pairs to use.
-     */
-    usePairs(...pairs: [Matchable | Matchable[], (MiddlewareHandler | MiddlewareHandler[] | void)][]): this {
-        for (const [event, handlers] of pairs) this.use(event, handlers);
-
-        return this;
-    }
-
-    /**
-     * Erisa#usePairs except it takes in a single array instead of variadic arguments.
-     *
-     * @param pairs Array of pairs to use.
-     */
-    usePairsArray(pairs: [Matchable | Matchable[], (MiddlewareHandler | MiddlewareHandler[] | void)][]): this {
-        for (const [event, handlers] of pairs) this.use(event, handlers);
-
-        return this;
-    }
-
-    /**
      * Removes the provided middleware from the events given.
      *
      * @param events The events to remove the middleware from.
      * @param handlers The specific middleware to remove.
      * @returns The current client instance.
      */
-    disuse(events: Matchable | Matchable[], ...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    disuse(events: Matchable | Matchable[], ...handlers: Array<MiddlewareHandler | MiddlewareHandler[]>): this;
 
     /**
      * Removes all middleware from the events given.
@@ -105,7 +102,7 @@ export class Erisa extends Eris.Client {
      * @param handlers The middleware functions to remove.
      * @returns The current client instance.
      */
-    disuse(...handlers: (MiddlewareHandler | MiddlewareHandler[])[]): this;
+    disuse(...handlers: Array<MiddlewareHandler | MiddlewareHandler[]>): this;
 
     disuse(...args) {
         const flattenedArgs = [].concat.apply([], args);
@@ -114,7 +111,7 @@ export class Erisa extends Eris.Client {
             if (!handlers.length) handlers = this.handlers.get(ev)!;
 
             for (const handler of handlers) {
-                const ourHandlers: [Matchable, MiddlewareHandler[]][] = ev === '*'
+                const ourHandlers: Array<[Matchable, MiddlewareHandler[]]> = ev === '*'
                     ? Array.from(this.handlers).filter(([_, hndlrs]) => hndlrs.includes(handler))
                     : [[ev, this.handlers.get(ev)!]] as [Matchable, MiddlewareHandler[]][]; // tslint:disable-line
 

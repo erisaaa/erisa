@@ -4,7 +4,7 @@ import 'mocha';
 import Eris from 'eris';
 import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {Erisa, Formattable, AwaitTimeout} from '../';
+import {Erisa, Formattable, AwaitTimeout, MiddlewareHandler} from '../index';
 import {events, mixedHandlers, handlers, tests} from './consts';
 
 type VoidFunc = () => void;
@@ -31,8 +31,8 @@ describe('erisa', () => {
             describe('registering under one event', () => {
                 for (const [name, tester] of Object.entries(tests))
                     specify(name, () => {
-                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use('foo', ...tester as (VoidFunc | VoidFunc[])[]);
-                        else client.use('foo', tester as VoidFunc | (VoidFunc)[]);
+                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use('foo', ...tester as Array<VoidFunc | VoidFunc[]>);
+                        else client.use('foo', tester as VoidFunc | VoidFunc[]);
 
                         // Everything other than the first test should be equal to `handlers`.
                         expect(client.handlers.get('foo')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
@@ -42,8 +42,8 @@ describe('erisa', () => {
             describe('registering under an event array', () => {
                 for (const [name, tester] of Object.entries(tests))
                     specify(name, () => {
-                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(events, ...tester as (VoidFunc | VoidFunc[])[]);
-                        else client.use(events, tester as VoidFunc | (VoidFunc)[]);
+                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(events, ...tester as Array<VoidFunc | VoidFunc[]>);
+                        else client.use(events, tester as VoidFunc | VoidFunc[]);
 
                         for (const ev of events) expect(client.handlers.get(ev)).to.deep.equal(name === 'single handler' ? [tester] : handlers);
                     });
@@ -52,22 +52,16 @@ describe('erisa', () => {
             describe('implicitly registering under the `*` event', () => {
                 for (const [name, tester] of Object.entries(tests))
                     specify(name, () => {
-                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(...tester as (VoidFunc | VoidFunc[])[]);
+                        if (['rest handlers', 'mix of handlers and arrays'].includes(name)) client.use(...tester as Array<VoidFunc | VoidFunc[]>);
                         else client.use(tester as VoidFunc | VoidFunc[]);
 
                         expect(client.handlers.get('*')).to.deep.equal(name === 'single handler' ? [tester] : handlers);
                     });
             });
-        });
 
-        describe('#usePairs', () => {
-            it('should return `this`', () => {
-                expect(client.usePairs()).to.equal(client);
-            });
-
-            it('should register the provided pairs of events and middleware correctly', () => {
-                client.usePairs(['foo', handlers[0]]);
-                client.usePairs(['bar', handlers[0]], ['bar', handlers[1]], ['foobar', handlers[2]]);
+            it('should register pairs of events and middleware correctly', () => {
+                client.use([['foo', handlers[0]]]);
+                client.use([['bar', handlers[0]], ['bar', handlers[1]], ['foobar', handlers[2]]]);
 
                 expect(client.handlers.get('foo')).to.deep.equal([handlers[0]]);
                 expect(client.handlers.get('bar')).to.deep.equal([handlers[0], handlers[1]]);
