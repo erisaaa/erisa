@@ -2,6 +2,7 @@ import Eris from 'eris';
 import { default as minimatch } from 'minimatch';
 
 import awaitMessageHandler from './awaitMessageHandler';
+import { flat } from './util';
 import {
   AwaitingObject,
   AwaitMessageOptions,
@@ -64,7 +65,7 @@ export default class Erisa extends Eris.Client {
   ): this;
 
   use(...args) {
-    const flattenedArgs = args.flat().filter(v => v);
+    const flattenedArgs = flat(args).filter(v => v);
     const setHandlers = (ev: Matchable, handlers: MiddlewareHandler[]) => {
       if (!this.handlers.get(ev)) this.handlers.set(ev, handlers);
       else this.handlers.set(ev, this.handlers.get(ev)!.concat([], handlers)); // typescript is dumb here :(
@@ -91,7 +92,7 @@ export default class Erisa extends Eris.Client {
       setHandlers('*', flattenedArgs);
     else {
       let [events, ...handlers] = args;
-      handlers = handlers.flat().filter(v => v); // Clean out void functions.
+      handlers = flat(handlers).filter(v => v); // Clean out void functions.
       events = !Array.isArray(events) ? [events] : events;
 
       for (const ev of events) setHandlers(ev, handlers);
@@ -115,7 +116,7 @@ export default class Erisa extends Eris.Client {
   disuse(...handlers: Array<MiddlewareHandler | MiddlewareHandler[]>): this;
 
   disuse(...args) {
-    const flattenedArgs = args.flat();
+    const flattenedArgs = flat(args);
     const removeHandlers = (ev: Matchable, handlers_: MiddlewareHandler[]) => {
       if (!this.handlers.get(ev) && ev !== '*') return;
       const handlers = handlers_.length ? handlers_ : this.handlers.get(ev)!;
@@ -152,7 +153,7 @@ export default class Erisa extends Eris.Client {
       removeHandlers('*', flattenedArgs);
     else {
       let [events, ...handlers] = args;
-      handlers = handlers.flat();
+      handlers = flat(handlers);
       events = typeof events === 'string' ? [events] : events;
 
       for (const ev of events) removeHandlers(ev, handlers);
@@ -221,9 +222,11 @@ export default class Erisa extends Eris.Client {
             (k instanceof RegExp ? k.test(event) : minimatch(event, k)) &&
             k !== event
         );
-        const handlers = Array.from(this.handlers.entries())
-          .filter(([event]) => matchingEvents.includes(event))
-          .flatMap(([, handler]) => handler);
+        const handlers = flat(
+          Array.from(this.handlers.entries())
+            .filter(([event]) => matchingEvents.includes(event))
+            .map(([, handler]) => handler)
+        );
 
         for (const handler of handlers) // eslint-disable-next-line no-await-in-loop
           await handler({ event, erisa: this }, ...args);
@@ -245,6 +248,8 @@ export default class Erisa extends Eris.Client {
    * @returns The formatted string.
    */
   format(obj: Formattable, noDiscrim?: boolean): string {
+    // TODO: allow users to extend with their own formatter functions
+    // also probably make a FormatError
     let ret: string;
 
     if (obj instanceof Eris.Member)

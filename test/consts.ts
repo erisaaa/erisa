@@ -16,9 +16,9 @@ export const mixedHandlers = [
   handlers[5],
   [handlers[6]]
 ];
-export const tests = {
+export const tests = Object.entries({
   'single handler': handlers[0],
   'handler array': handlers,
   'rest handlers': handlers,
   'mix of handlers and arrays': mixedHandlers
-};
+});
