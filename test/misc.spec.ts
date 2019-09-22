@@ -4,24 +4,26 @@ import Eris from 'eris';
 
 import { Erisa, AwaitTimeout } from '../index'; // eslint-disable-line import/no-useless-path-segments
 
-const client = new Erisa('');
+let client = new Erisa('');
 const testMockCountLater = (
   fn: jest.Mock<any, any>,
   times: number,
   done: jest.DoneCallback
 ) =>
-  setImmediate(() => {
+  setTimeout(() => {
     try {
       expect(fn).toBeCalledTimes(times);
       done();
     } catch (err) {
       done(err);
     }
-  });
+  }, 0);
 const makeArgumentlessLaterFunc = <F extends (...args: any[]) => any>(
   fn: F,
   ...args: Parameters<F>
 ): (() => ReturnType<F>) => () => fn(...args);
+
+beforeEach(() => (client = new Erisa('')));
 
 describe('Erisa#handleEvent', () => {
   test('fires the assigned event', done => {
@@ -38,7 +40,12 @@ describe('Erisa#handleEvent', () => {
   describe('star (wildcard)', () => {
     test('matches wildcard and regex events', done => {
       const dontCall = () => done(new Error('Invalid call'));
-      const call = jest.fn();
+      const call = () => {
+        count++;
+        if (count === 3) done();
+        else if (count > 3) done(new Error('Called too many times'));
+      };
+      let count = 0;
 
       client.use('*', call);
       client.use(/foo/, call);
@@ -48,14 +55,12 @@ describe('Erisa#handleEvent', () => {
       client.use(/bar/, dontCall);
       client.use('b*', dontCall);
 
-      client.handleEvent('foo')();
-
-      testMockCountLater(call, 3, done);
+      client.handleEvent('*')('foo');
     });
   });
 });
 
-describe.only('Erisa#emit', () => {
+describe('Erisa#emit', () => {
   test('emits a `*` event alongside the original', done => {
     const hit = jest.fn();
 

@@ -8,7 +8,9 @@ type Void = () => void;
 const isMultiHandler = (name: string) =>
   name === 'rest handlers' || name === 'mix of handlers and arrays';
 
-const client = new Erisa('');
+let client = new Erisa('');
+
+beforeEach(() => (client = new Erisa('')));
 
 describe('Erisa#use', () => {
   it('returns `this`', () => {
