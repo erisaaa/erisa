@@ -262,13 +262,7 @@ export default class Erisa extends Eris.Client {
       ret = obj.mentionable ? obj.mention : obj.name;
     else if (obj instanceof Eris.Channel) ret = obj.mention;
     else if (obj instanceof Eris.Guild) ret = obj.name;
-    else
-      throw new TypeError(
-        `Unable to format object: ${
-          // @ts-ignore
-          obj && obj.constructor ? obj.constructor.name : obj
-        }`
-      ); // tslint:disable-line
+    else throw new TypeError(`Unable to format object: ${obj}`);
 
     return ret;
   }
