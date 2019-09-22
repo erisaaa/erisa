@@ -1,3 +1,4 @@
+/* eslint-disable no-sequences */
 import 'jest';
 
 import Eris from 'eris';

@@ -4,7 +4,9 @@
     "allowJs": true
   },
   "include": [
-    "**.ts",
-    "**.js"
+    "index.ts",
+    "src/",
+    "test/",
+    "jest.config.js"
   ]
 }
