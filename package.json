@@ -14,7 +14,7 @@
     "compile": "tsc -p .",
     "clean": "rimraf dist",
     "build": "yarn clean && yarn compile",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn test && yarn build"
   },
   "dependencies": {
     "eris": "^0.10.1",
@@ -23,7 +23,6 @@
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/minimatch": "^3.0.3",
-    "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.5",
     "@typescript-eslint/eslint-plugin": "2.3.0",
     "@typescript-eslint/parser": "2.3.0",
