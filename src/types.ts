@@ -12,14 +12,11 @@ export type MiddlewareHandler = (
 ) => OptionalAsync<Error | void>;
 export type Matchable = string | RegExp;
 
-/** An object considered to be able to be formatted by Erisa#format. */
-export type Formattable =
-  | Eris.Member
-  | Eris.User
-  | Eris.ExtendedUser
-  | Eris.Role
-  | Eris.Guild
-  | Eris.Channel;
+/**
+ * Function used in Erisa#format for custom formatting of objects.
+ * Should throw FormatError if given a bad object.
+ */
+export type Formatter<T> = (obj: T, alt?: boolean) => string;
 
 export interface ErisaOptions {
   erisOptions?: Eris.ClientOptions;

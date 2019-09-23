@@ -3,7 +3,7 @@ import 'jest';
 
 import Eris from 'eris';
 
-import { Erisa, AwaitTimeout } from '../index'; // eslint-disable-line import/no-useless-path-segments
+import { Erisa, AwaitTimeout, FormatError, Formatter } from '../index'; // eslint-disable-line import/no-useless-path-segments
 
 let client = new Erisa('');
 const testMockCountLater = (
@@ -92,17 +92,17 @@ describe('Erisa#format', () => {
     const format = client.format.bind(client) as typeof client.format;
 
     expect(makeArgumentlessLaterFunc(format, null as any)).toThrowError(
-      TypeError
+      FormatError
     );
     expect(makeArgumentlessLaterFunc(format, undefined as any)).toThrowError(
-      TypeError
+      FormatError
     );
     expect(makeArgumentlessLaterFunc(format, false as any)).toThrowError(
-      TypeError
+      FormatError
     );
     expect(
       makeArgumentlessLaterFunc(format, new FakeClass() as any)
-    ).toThrowError(TypeError);
+    ).toThrowError(FormatError);
   });
 
   describe('formatting `Member`', () => {
@@ -120,10 +120,10 @@ describe('Erisa#format', () => {
 
     test("doesn't show the member's discriminator", () => {
       member.nick = 'Foo';
-      expect(client.format(member, true)).toBe('Foo');
+      expect(client.format(member, { alt: true })).toBe('Foo');
 
       member.nick = 'foo';
-      expect(client.format(member, true)).toBe('foo');
+      expect(client.format(member, { alt: true })).toBe('foo');
     });
   });
 
@@ -138,7 +138,7 @@ describe('Erisa#format', () => {
     });
 
     test("doesn't show the user's discriminator", () => {
-      expect(client.format(user, true)).toBe('foo');
+      expect(client.format(user, { alt: true })).toBe('foo');
     });
   });
 
@@ -171,6 +171,23 @@ describe('Erisa#format', () => {
 
     test("shows the guild's name", () => {
       expect(client.format(guild)).toBe('foo');
+    });
+  });
+
+  describe('custom formatter', () => {
+    test('gets called instead of default formatter', () => {
+      const formatter: Formatter<Eris.User> = user => user.mention;
+      const user = new Eris.User({ id: '1234567890' } as any, client);
+
+      expect(client.format(user, { formatter })).toBe(user.mention);
+    });
+
+    test('uses the alt mode', () => {
+      const formatter: Formatter<Eris.User> = (user, alt) =>
+        alt ? user.id : user.mention;
+      const user = new Eris.User({ id: '1234567890' } as any, client);
+
+      expect(client.format(user, { formatter, alt: true })).toBe(user.id);
     });
   });
 });

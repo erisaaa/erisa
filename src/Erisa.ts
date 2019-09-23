@@ -2,14 +2,14 @@ import Eris from 'eris';
 import { default as minimatch } from 'minimatch';
 
 import awaitMessageHandler from './awaitMessageHandler';
-import { flat } from './util';
+import { flat, FormatError } from './util';
 import {
   AwaitingObject,
   AwaitMessageOptions,
   AwaitTimeout,
   DeferredPromise,
   ErisaOptions,
-  Formattable,
+  Formatter,
   Matchable,
   MiddlewareHandler
 } from './types';
@@ -244,26 +244,27 @@ export default class Erisa extends Eris.Client {
    * Formats a provided Eris object into a string form, since they don't have `.toString` methods.
    *
    * @param obj Object to format.
-   * @param noDiscrim If formatting a user, whether to not include their discriminator in the resultant string.
+   * @param alt Whether to enable alternate behaviour. Disables showing discriminator if formatting users.
+   * @param formatter Custom formatter function. Intended for use for non-Eris objects.
    * @returns The formatted string.
    */
-  format(obj: Formattable, noDiscrim?: boolean): string {
-    // TODO: allow users to extend with their own formatter functions
-    // also probably make a FormatError
-    let ret: string;
+  format<T>(
+    obj: T,
+    { alt, formatter }: { alt?: boolean; formatter?: Formatter<T> } = {}
+  ): string {
+    // Should we store formatters in an internal map and let users add/remove as they please without passing them to this?
+    if (formatter) return formatter(obj, alt);
 
     if (obj instanceof Eris.Member)
-      ret = `${obj.nick || obj.username}${
-        !noDiscrim ? `#${obj.discriminator}` : ''
+      return `${obj.nick || obj.username}${
+        !alt ? `#${obj.discriminator}` : ''
       }`;
     else if (obj instanceof Eris.User)
-      ret = `${obj.username}${!noDiscrim ? `#${obj.discriminator}` : ''}`;
+      return `${obj.username}${!alt ? `#${obj.discriminator}` : ''}`;
     else if (obj instanceof Eris.Role)
-      ret = obj.mentionable ? obj.mention : obj.name;
-    else if (obj instanceof Eris.Channel) ret = obj.mention;
-    else if (obj instanceof Eris.Guild) ret = obj.name;
-    else throw new TypeError(`Unable to format object: ${obj}`);
-
-    return ret;
+      return obj.mentionable ? obj.mention : obj.name;
+    else if (obj instanceof Eris.Channel) return obj.mention;
+    else if (obj instanceof Eris.Guild) return obj.name;
+    else throw new FormatError(obj);
   }
 }
