@@ -3,7 +3,7 @@ import 'jest';
 
 import Eris from 'eris';
 
-import { Erisa, AwaitTimeout, FormatError, Formatter } from '../index'; // eslint-disable-line import/no-useless-path-segments
+import Erisa, {AwaitTimeout, FormatError, Formatter } from '../';
 
 let client = new Erisa('');
 const testMockCountLater = (

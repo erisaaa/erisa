@@ -130,7 +130,7 @@ export default class Erisa extends Eris.Client {
             : [[ev, this.handlers.get(ev)!]]; // tslint:disable-line
 
         for (const [event, handlers__] of ourHandlers) {
-          const copied = handlers__.slice(); // Copies `handlers` to a brand new object, instead of operating on the reference.
+          const copied = handlers__.slice(); // Work on a new object, instead of operating on the reference.
 
           copied.splice(copied.indexOf(handler), 1);
 

@@ -1,6 +1,4 @@
-import 'jest';
-
-import { Erisa } from '../index'; // eslint-disable-line import/no-useless-path-segments
+import Erisa from '../';
 
 import { events, handlers, tests } from './consts';
 

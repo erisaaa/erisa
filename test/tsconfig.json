@@ -1,14 +1,16 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "lib": ["esnext"],
-        "module": "commonjs",
-        "allowSyntheticDefaultImports": true,
-        "strictNullChecks": true,
-        "esModuleInterop": true,
-        "noEmit": true
-    },
-    "include": [
-        "./"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "esnext"
+    ],
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "noEmit": true
+  },
+  "include": [
+    "./"
+  ]
 }
